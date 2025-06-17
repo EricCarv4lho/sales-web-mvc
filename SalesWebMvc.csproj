@@ -7,17 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Views\Departments\**" />
-    <Content Remove="Views\Departments\**" />
-    <EmbeddedResource Remove="Views\Departments\**" />
-    <None Remove="Views\Departments\**" />
-  </ItemGroup>
+  <Compile Remove="Views\Departments\**" />
+  <Content Remove="Views\Departments\**" />
+  <EmbeddedResource Remove="Views\Departments\**" />
+  <None Remove="Views\Departments\**" />
+</ItemGroup>
 
   <ItemGroup>
-    <None Include="Views\Departments\Create.cshtml" />
-    <None Include="Views\Departments\Delete.cshtml" />
-    <None Include="Views\Departments\Details.cshtml" />
-    <None Include="Views\Departments\Edit.cshtml" />
+    <Content Include="Views\Departments\Create.cshtml" />
+    <Content Include="Views\Departments\Delete.cshtml" />
+    <Content Include="Views\Departments\Details.cshtml" />
+    <Content Include="Views\Departments\Edit.cshtml" />
+    <Content Include="Views\Departments\Index.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
