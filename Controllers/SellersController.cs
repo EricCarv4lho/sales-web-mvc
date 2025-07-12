@@ -3,10 +3,10 @@ using SalesWebMvc.Services;
 
 namespace SalesWebMvc.Controllers
 {
-
-    public class SellersController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class SellersController : ControllerBase
     {
-
         private readonly SellerService _sellerService;
 
         public SellersController(SellerService sellerService)
@@ -14,14 +14,11 @@ namespace SalesWebMvc.Controllers
             _sellerService = sellerService;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public IActionResult GetSellers()
         {
-
             var list = _sellerService.findAll();
-
-            return View(list);
+            return Ok(list);
         }
-
-
     }
 }
