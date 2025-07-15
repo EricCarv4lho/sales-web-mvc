@@ -28,11 +28,36 @@ Instrutor: Nelio Alves
 
 ### 1. Pré-requisitos
 
-- [.NET SDK](https://dotnet.microsoft.com/en-us/download) instalado (versão recomendada: .NET 8 ou superior)
-- PostgreSQL (ou outro banco compatível)
-- Visual Studio 2022 
+
+.NET SDK, Node.js, PostgreSQL
+
+
 
 ### 2. Clonar o repositório
 
 ```bash
 git clone https://github.com/EricCarv4lho/sales-web-mvc.git
+
+```
+### 3. Configure sua string de conexão PostgreSQL no arquivo appsettings.Development.json
+
+
+```bash
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=salesdb;Username=seu_usuario;Password=sua_senha"
+  }
+}
+
+```
+No backend:
+```bash
+dotnet ef database update
+dotnet run
+```
+
+No frontend:
+
+```bash
+npm install
+npm run dev
