@@ -7,10 +7,9 @@ Aplicação web para simular um sistema de listagem de vendedores e seus departa
 - Atualizar dados existentes
 - Excluir registros
 
-O projeto foi desenvolvido usando ASP.NET Core MVC com Entity Framework Core e PostgreSQL no back-end, e React (com Vite.js) no front-end, baseado no curso:
+O projeto foi desenvolvido usando ASP.NET Core MVC com Entity Framework Core e PostgreSQL no back-end, e React (com Vite.js) no front-end.
 
-🎓 *C# COMPLETO 2020: Programação Orientada a Objetos + Projetos*  
-Instrutor: Nelio Alves
+
 
 ---
 
