@@ -44,7 +44,7 @@ git clone https://github.com/EricCarv4lho/sales-web-mvc.git
 ```bash
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=salesdb;Username=seu_usuario;Password=sua_senha"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=seu_database;Username=seu_usuario;Password=sua_senha"
   }
 }
 
