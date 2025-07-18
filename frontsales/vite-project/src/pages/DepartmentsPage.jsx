@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { fetchDepartments } from "../services/api";
-
+import DepartmentList from "../components/DepartmentList";
 import { Link } from "react-router-dom";
+import { createDepartmentApi } from "../services/api";
 
 function DepartmentsPage() {
   const [departments, setDepartments] = useState([]);
 
+  const [createDepartment, setCreateDepartment] = useState(false);
+  const [departmentName, setDepartmentName] = useState("");
   useEffect(() => {
     fetchDepartments()
       .then((data) => setDepartments(data))
@@ -17,7 +20,7 @@ function DepartmentsPage() {
       id="content"
       className="flex-col justify-center items-center space-y-10"
     >
-      <nav class="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
+      <nav class=" dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <span class="self-center text-2xl font-semibold whitespace-nowrap text-amber-50">
             Sales Web MVC
@@ -32,28 +35,13 @@ function DepartmentsPage() {
               aria-expanded="false"
             >
               <span class="sr-only">Open main menu</span>
-              <svg
-                class="w-5 h-5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 17 14"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M1 1h15M1 7h15M1 13h15"
-                />
-              </svg>
             </button>
           </div>
           <div
             class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
             id="navbar-sticky"
           >
-            <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+            <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg  md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0  dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
               <li>
                 <Link
                   to={"/"}
@@ -94,7 +82,7 @@ function DepartmentsPage() {
 
       <div
         id="titulo"
-        className=" flex flex-col items-center justify-center mt-20 bg-gray-50 p-6"
+        className=" flex flex-col items-center justify-center mt-20  p-6"
       >
         <h1 className="text-amber-50 text-5xl font-bold  mb-8">Departments</h1>
       </div>
@@ -115,18 +103,24 @@ function DepartmentsPage() {
                   id="botoes"
                   className=" flex flex-row justify-center gap-4"
                 >
-                  <button
-                    type="button"
-                    class="text-white bg-gradient-to-r  cursor-pointer from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    type="button"
-                    class="text-white bg-gradient-to-r  cursor-pointer from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                  >
-                    Detalhes
-                  </button>
+                  <Link to={`/departments/editar/${dep.id}`}>
+                    {" "}
+                    <button
+                      type="button"
+                      class="text-white bg-gradient-to-r  cursor-pointer from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                    >
+                      Editar
+                    </button>
+                  </Link>
+
+                  <Link to={`/departments/detalhes/${dep.id}`}>
+                    <button
+                      type="button"
+                      class="text-white bg-gradient-to-r  cursor-pointer from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                    >
+                      Detalhes
+                    </button>
+                  </Link>
                   <button
                     type="button"
                     class="text-white bg-gradient-to-r cursor-pointer from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
@@ -138,6 +132,66 @@ function DepartmentsPage() {
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="flex items-center gap-2 md:flex-row  justify-center ">
+        <button
+          onClick={() => setCreateDepartment(true)}
+          className="  bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 cursor-pointer hover:bg-gradient-to-br text-amber-50 rounded-lg text-sm font-bold px-5 py-2.5 text-center me-2 mb-2"
+        >
+          CRIAR
+        </button>
+        {createDepartment && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+            <div className="bg-white rounded-lg p-6 w-80 space-y-4 shadow-lg">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Novo Departamento
+              </h2>
+
+              <input
+                type="text"
+                placeholder="Nome do departamento"
+                value={departmentName}
+                onChange={(e) => setDepartmentName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setCreateDepartment(false)}
+                  className="text-gray-600 hover:text-gray-800 px-4 py-2"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={async () => {
+                    const trimedName = departmentName.trim();
+                    if (!trimedName) {
+                      alert("Type a valid name to department.");
+                      return;
+                    }
+
+                    try {
+                      const createdDepartment = await createDepartmentApi({
+                        name: trimedName,
+                      });
+                      setDepartments([...departments, createdDepartment]);
+                      setDepartmentName("");
+                      
+                      setCreateDepartment(false);
+                    } catch (error) {
+                      console.error(
+                        "Error ocurred when creating a new department.."
+                      );
+                    }
+                  }}
+                  className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
