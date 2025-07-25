@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchDepartments } from "../services/api";
-
+import DepartmentList from "../components/DepartmentList";
 import { Link } from "react-router-dom";
 import { createDepartmentApi } from "../services/api";
 
