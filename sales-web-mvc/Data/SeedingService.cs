@@ -21,18 +21,18 @@ namespace SalesWebMvc.Data
                 return;
             }
 
-            Department d1 = new(1, "Computers");
-            Department d2 = new(2, "Electronics");
-            Department d3 = new(3, "Fashion");
-            Department d4 = new(4, "Books");
+            Department d1 = new("Computers");
+            Department d2 = new("Electronics");
+            Department d3 = new ("Fashion");
+            Department d4 = new( "Books");
 
 
-            Seller s1 = new(1, "Bob Brown", "bob@email.com", new DateTime(1998, 4, 21, 0, 0, 0, 0, DateTimeKind.Utc), 1000.00, d1);
-            Seller s2 = new(2, "Maria Green", "maria@gmail.com", new DateTime(1979, 12, 31, 0, 0, 0, 0, DateTimeKind.Utc), 3500.0, d2);
-            Seller s3 = new(3, "Alex Grey", "alex@gmail.com", new DateTime(1988, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc), 2200.0, d1);
-            Seller s4 = new(4, "Martha Red", "martha@gmail.com", new DateTime(1993, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc), 3000.0, d4);
-            Seller s5 = new(5, "Donald Blue", "donald@gmail.com", new DateTime(2000, 1, 9, 0, 0, 0, 0, DateTimeKind.Utc), 4000.0, d3);
-            Seller s6 = new(6, "Alex Pink", "bob@gmail.com", new DateTime(1997, 3, 4, 0, 0, 0, 0, DateTimeKind.Utc), 3000.0, d2);
+            Seller s1 = new( "Bob Brown", "bob@email.com", new DateTime(1998, 4, 21, 0, 0, 0, 0, DateTimeKind.Utc), 1000.00, d1);
+            Seller s2 = new( "Maria Green", "maria@gmail.com", new DateTime(1979, 12, 31, 0, 0, 0, 0, DateTimeKind.Utc), 3500.0, d2);
+            Seller s3 = new( "Alex Grey", "alex@gmail.com", new DateTime(1988, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc), 2200.0, d1);
+            Seller s4 = new( "Martha Red", "martha@gmail.com", new DateTime(1993, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc), 3000.0, d4);
+            Seller s5 = new( "Donald Blue", "donald@gmail.com", new DateTime(2000, 1, 9, 0, 0, 0, 0, DateTimeKind.Utc), 4000.0, d3);
+            Seller s6 = new( "Alex Pink", "bob@gmail.com", new DateTime(1997, 3, 4, 0, 0, 0, 0, DateTimeKind.Utc), 3000.0, d2);
 
             SalesRecord r1 = new(1, new DateTime(2018, 09, 25, 0, 0, 0, 0, DateTimeKind.Utc), 11000.0, SaleStatus.Billed, s1);
             SalesRecord r2 = new(2, new DateTime(2018, 09, 4, 0, 0, 0, 0, DateTimeKind.Utc), 7000.0, SaleStatus.Billed, s5);

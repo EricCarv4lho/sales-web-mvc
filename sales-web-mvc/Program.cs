@@ -15,7 +15,7 @@ builder.Services.AddDbContext<SalesWebMvcContext>(options =>
 );
 
 // Injeção de dependências
-builder.Services.AddScoped<SeedingService>();
+//builder.Services.AddScoped<SeedingService>();
 builder.Services.AddScoped<SellerService>();
 
 // Controllers e Swagger
@@ -37,12 +37,12 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Seed do banco (dados iniciais)
-using (var scope = app.Services.CreateScope())
+/*using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var seedingService = services.GetRequiredService<SeedingService>();
     seedingService.Seed();
-}
+}*/
 
 // Middleware
 if (app.Environment.IsDevelopment())

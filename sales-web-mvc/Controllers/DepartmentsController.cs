@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SalesWebMvc.Data;
 using SalesWebMvc.Models;
-
+using SalesWebMvc.Dto;
 namespace SalesWebMvc.Controllers
 {
     [ApiController]
@@ -17,11 +17,30 @@ namespace SalesWebMvc.Controllers
         }
 
         // GET: api/departments
+        
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments()
+        public async Task<ActionResult<IEnumerable<DepartmentReadDto>>> GetDepartments()
         {
-            return await _context.Department.ToListAsync();
+            var departments = await _context.Department
+                .Include(d => d.Sellers)
+                .ToListAsync();
+
+            var dtoList = departments.Select(d => new DepartmentReadDto
+            {
+                Id = d.Id,
+                Name = d.Name,
+                Sellers = d.Sellers.Select(s => new SellerBasicDto
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Email = s.Email
+                }).ToList()
+            });
+
+            return Ok(dtoList);
         }
+
+
 
         // GET: api/departments/5
         [HttpGet("{id}")]
@@ -37,9 +56,15 @@ namespace SalesWebMvc.Controllers
         }
 
         // POST: api/departments
+        
         [HttpPost]
-        public async Task<ActionResult<Department>> PostDepartment(Department department)
+        public async Task<ActionResult<Department>> PostDepartment(DepartmentCreateDto dto)
         {
+            var department = new Department
+            {
+                Name = dto.Name
+            };
+
             _context.Department.Add(department);
             await _context.SaveChangesAsync();
 
