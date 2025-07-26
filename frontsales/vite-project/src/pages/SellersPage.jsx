@@ -77,32 +77,22 @@ function SellersPage() {
       id="content"
       className="flex-col justify-center items-center space-y-10"
     >
-      <nav class=" dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
-        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <span class="self-center text-2xl font-semibold whitespace-nowrap text-amber-50">
+<nav className="dark:bg-gray-900 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700   fixed w-full top-0 start-0  dark:border-gray-600 shadow-md">
+        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+          <span className="self-center text-2xl font-semibold whitespace-nowrap text-amber-50">
             Sales Web MVC
           </span>
 
-          <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-            <button
-              data-collapse-toggle="navbar-sticky"
-              type="button"
-              class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-              aria-controls="navbar-sticky"
-              aria-expanded="false"
-            >
-              <span class="sr-only">Open main menu</span>
-            </button>
-          </div>
+          
           <div
-            class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
+            className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
             id="navbar-sticky"
           >
-            <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg  md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0  dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+            <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg  md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0  dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
               <li>
                 <Link
                   to={"/"}
-                  class="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                   aria-current="page"
                 >
                   Home
@@ -111,33 +101,26 @@ function SellersPage() {
               <li>
                 <Link
                   to={"/departments"}
-                  class="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                 >
-                  Departments
+                  Departmentos
                 </Link>
               </li>
               <li>
                 <Link
                   to={"/sellers"}
-                  className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                 >
-                  Sellers
+                  Vendedores
                 </Link>
               </li>
+              
               <li>
                 <a
                   href="#"
-                  class="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                 >
-                  Services
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-                >
-                  Contact
+                  Contato
                 </a>
               </li>
             </ul>
@@ -155,6 +138,14 @@ function SellersPage() {
       <div id="tabela" className="flex justify-center flex-grow ">
         <table className="w-3/4   border-collapse ">
           <thead>
+            <button id="buttonCreate"
+          onClick={() => setCreateSeller(true) 
+           
+          }
+                      className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+        >
+          CRIAR
+        </button>
             <tr className="">
               <td className="border text-amber-50 border-gray-300 px-4 py-2">
                 NOME
@@ -201,7 +192,7 @@ function SellersPage() {
                       {" "}
                       <button
                         type="button"
-                        class="text-white bg-gradient-to-r  cursor-pointer from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                      className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
                       >
                         Editar
                       </button>
@@ -210,14 +201,14 @@ function SellersPage() {
                     <Link to={`/sellers/detalhes/${sel.id}`}>
                       <button
                         type="button"
-                        class="text-white bg-gradient-to-r  cursor-pointer from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                      className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
                       >
                         Detalhes
                       </button>
                     </Link>
                     <button
                       type="button"
-                      class="text-white bg-gradient-to-r cursor-pointer from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                      className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
                     >
                       Deletar
                     </button>
@@ -229,85 +220,80 @@ function SellersPage() {
         </table>
       </div>
       <div className="flex items-center gap-2 md:flex-row  justify-center ">
-        <button id="buttonCreate"
-          onClick={() => setCreateSeller(true) 
-           
-          }
-          className="  bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 cursor-pointer hover:bg-gradient-to-br text-amber-50 rounded-lg text-sm font-bold px-5 py-2.5 text-center me-2 mb-2"
-        >
-          CRIAR
-        </button>
+        
         {createSeller && (
-          <div className="py-7">
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white p-6 rounded shadow-md w-96 "
-          >
-            <div>
-              <input
-                type="text"
-                placeholder="Nome"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded mb-2"
-              />
-            </div>
-            <div>
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded mb-2"
-              />
-            </div>
-            <div>
-              <input
-                type="date"
-                placeholder="Data de nascimento"
-                value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded mb-2"
-              />
-            </div>
-            <div>
-              <input
-                type="number"
-                placeholder="Salário base"
-                value={baseSalary}
-                onChange={(e) => setBaseSalary(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
-              />
-            </div>
+  <div className="fixed inset-0 bg-black/50  flex justify-center items-center z-50">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-6 rounded shadow-lg w-96"
+    >
+      <div>
+        <input
+          type="text"
+          placeholder="Nome"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded mb-2"
+        />
+      </div>
+      <div>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded mb-2"
+        />
+      </div>
+      <div>
+        <input
+          type="date"
+          placeholder="Data de nascimento"
+          value={birthDate}
+          onChange={(e) => setBirthDate(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded mb-2"
+        />
+      </div>
+      <div>
+        <input
+          type="number"
+          placeholder="Salário base"
+          value={baseSalary}
+          onChange={(e) => setBaseSalary(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
+        />
+      </div>
 
-            <div>
-              <Select
-                options={departments.map((dep) => ({
-                  value: dep.id,
-                  label: dep.name,
-                }))}
-                onChange={handleChange}
-              />
-            </div>
+      <div>
+        <Select
+          placeholder="Departamento"
+          options={departments.map((dep) => ({
+            value: dep.id,
+            label: dep.name,
+          }))}
+          onChange={handleChange}
+        />
+      </div>
 
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setCreateSeller(false)}
-                className="text-gray-600 hover:text-gray-800"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-              >
-                Enviar
-              </button>
-            </div>
-          </form>
-          </div>
-        )}
+      <div className="flex justify-end gap-2 mt-4">
+        <button
+          type="button"
+          onClick={() => setCreateSeller(false)}
+          className="text-gray-600 hover:text-gray-800"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Enviar
+        </button>
+        
+      </div>
+    </form>
+  </div>
+)}
       </div>
     </div>
   );
