@@ -24,19 +24,26 @@ namespace SalesWebMvc.Controllers
        
         public IActionResult GetSellers()
         {
-            var list = _sellerService.findAllDtos();
+            List<SellerReadDto> list = _sellerService.findAllDtos();
             return Ok(list);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetSeller(int id)
+        {
+            Seller seller = _sellerService.FindById(id);
+            return Ok(seller);
         }
 
         [HttpPost]
         public IActionResult CreateSeller([FromBody] SellerCreateDto dto)
         {
            
-            var seller = _sellerService.createSeller(dto);
+            Seller seller = _sellerService.CreateSeller(dto);
             if (seller == null)
                 return BadRequest("Department is not valid");
 
-            var readDto = new SellerReadDto
+            SellerReadDto readDto = new()
             {
                 Id = seller.Id,
                 Name = seller.Name,
@@ -48,6 +55,20 @@ namespace SalesWebMvc.Controllers
             };
 
             return Ok(readDto);
+        }
+        [HttpDelete("{id}")]
+        public IActionResult DeleteSeller(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                _sellerService.RemoveSeller(id.Value);
+            }
+
+            return Ok();
         }
 
     }

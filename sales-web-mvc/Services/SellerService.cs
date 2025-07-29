@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+using NuGet.Versioning;
 using SalesWebMvc.Data;
 using SalesWebMvc.Dto;
 using SalesWebMvc.Models;
@@ -31,8 +33,35 @@ namespace SalesWebMvc.Services
             }).ToList();
         }
 
+        public Seller FindById(int? id)
+        {   
+           
+            var seller = _context.Seller.FirstOrDefault(s => s.Id == id);
+            if (seller == null)
+            {
+                throw new KeyNotFoundException("Vendedor nao encontrado");
+            }
+            else
+            {
+                return seller;
+            }
 
-        public Seller createSeller(SellerCreateDto dto)
+           
+        }
+
+        public void RemoveSeller(int id)
+        {
+            var seller = FindById(id);
+           
+            
+                _context.Remove(seller);
+            
+           
+            _context.SaveChanges();
+            
+        }
+
+        public Seller CreateSeller(SellerCreateDto dto)
         {
             var department = _context.Department.FirstOrDefault(d => d.Id == dto.DepartmentId);
             if (department == null) 
@@ -48,7 +77,7 @@ namespace SalesWebMvc.Services
             _context.Seller.Add(seller);
             _context.SaveChanges();
 
-            // 🔧 Carregar o seller já com o Department incluído
+            
             return _context.Seller
                 .Include(s => s.Department)
                 .FirstOrDefault(s => s.Id == seller.Id)!;
