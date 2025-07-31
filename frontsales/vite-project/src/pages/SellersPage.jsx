@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchSellers } from "../services/api";
+import { deleteSellers, fetchSellers } from "../services/api";
 
 import { Link } from "react-router-dom";
 
@@ -27,15 +27,17 @@ function SellersPage() {
       .catch((err) => console.error(err));
   }, []);
 
+  
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [baseSalary, setBaseSalary] = useState("");
-
+  const [sellerId, setSellerId] = useState(0);
   const [departmentId, setDepartmentId] = useState(0);
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+ 
     const trimmedName = name.trim();
     const trimmedEmail = email.trim();
 
@@ -72,18 +74,19 @@ function SellersPage() {
     setDepartmentId(e.value);
   };
 
+  const [openModalDelete, setOpenModalDelete] = useState(false);
+
   return (
     <div
       id="content"
       className="flex-col justify-center items-center space-y-10"
     >
-<nav className="dark:bg-gray-900 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700   fixed w-full top-0 start-0  dark:border-gray-600 shadow-md">
+      <nav className="dark:bg-gray-900 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700   fixed w-full top-0 start-0  dark:border-gray-600 shadow-md">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <span className="self-center text-2xl font-semibold whitespace-nowrap text-amber-50">
             Sales Web MVC
           </span>
 
-          
           <div
             className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
             id="navbar-sticky"
@@ -92,7 +95,7 @@ function SellersPage() {
               <li>
                 <Link
                   to={"/"}
-                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                  className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                   aria-current="page"
                 >
                   Home
@@ -101,7 +104,7 @@ function SellersPage() {
               <li>
                 <Link
                   to={"/departments"}
-                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                  className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                 >
                   Departmentos
                 </Link>
@@ -109,16 +112,16 @@ function SellersPage() {
               <li>
                 <Link
                   to={"/sellers"}
-                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                  className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                 >
                   Vendedores
                 </Link>
               </li>
-              
+
               <li>
                 <a
                   href="#"
-                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                  className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                 >
                   Contato
                 </a>
@@ -138,14 +141,13 @@ function SellersPage() {
       <div id="tabela" className="flex justify-center flex-grow ">
         <table className="w-3/4   border-collapse ">
           <thead>
-            <button id="buttonCreate"
-          onClick={() => setCreateSeller(true) 
-           
-          }
-                      className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-        >
-          CRIAR
-        </button>
+            <button
+              id="buttonCreate"
+              onClick={() => setCreateSeller(true)}
+              className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+            >
+              CRIAR
+            </button>
             <tr className="">
               <td className="border text-amber-50 border-gray-300 px-4 py-2">
                 NOME
@@ -174,7 +176,6 @@ function SellersPage() {
                   {sel.email}
                 </td>
                 <td className="border text-amber-50 border-gray-300 px-4 py-2">
-
                   {sel.birthDate}
                 </td>
                 <td className="border text-amber-50 border-gray-300 px-4 py-2">
@@ -192,7 +193,7 @@ function SellersPage() {
                       {" "}
                       <button
                         type="button"
-                      className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                        className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
                       >
                         Editar
                       </button>
@@ -201,7 +202,7 @@ function SellersPage() {
                     <Link to={`/sellers/detalhes/${sel.id}`}>
                       <button
                         type="button"
-                      className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                        className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
                       >
                         Detalhes
                       </button>
@@ -209,6 +210,12 @@ function SellersPage() {
                     <button
                       type="button"
                       className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                       
+                      onClick={() => { setOpenModalDelete(true);
+                        setSellerId(sel.id)
+                        console.log(sel.id)
+                      }
+                      }
                     >
                       Deletar
                     </button>
@@ -220,80 +227,113 @@ function SellersPage() {
         </table>
       </div>
       <div className="flex items-center gap-2 md:flex-row  justify-center ">
-        
+        {openModalDelete && (
+           <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+                      <div className="bg-white rounded-lg p-6 w-80 space-y-4 shadow-lg">
+                        <h2 className="text-xl font-semibold text-gray-800">
+                         Tem certeza que deseja deletar este vendedor?
+                        </h2>
+          
+                       
+          
+                        <div className="flex justify-end gap-2">
+                          <button
+                           onClick={() => setOpenModalDelete(false)}
+                            className="text-gray-600 hover:text-gray-800 px-4 py-2"
+                          >
+                            Cancelar
+                          </button>
+                          <button 
+                            onClick={ async () => { try{ await deleteSellers(sellerId);
+                              setOpenModalDelete(false);
+                              var data = await fetchSellers();
+                            setSellers(data)}
+                              catch (err) {
+                                console.log('erro ao deletar', err);
+                              }
+                            }
+                              
+                            }
+                            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                          >
+                            DELETAR
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+        )}
         {createSeller && (
-  <div className="fixed inset-0 bg-black/50  flex justify-center items-center z-50">
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white p-6 rounded shadow-lg w-96"
-    >
-      <div>
-        <input
-          type="text"
-          placeholder="Nome"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded mb-2"
-        />
-      </div>
-      <div>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded mb-2"
-        />
-      </div>
-      <div>
-        <input
-          type="date"
-          placeholder="Data de nascimento"
-          value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded mb-2"
-        />
-      </div>
-      <div>
-        <input
-          type="number"
-          placeholder="Salário base"
-          value={baseSalary}
-          onChange={(e) => setBaseSalary(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
-        />
-      </div>
+          <div className="fixed inset-0 bg-black/50  flex justify-center items-center z-50">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white p-6 rounded shadow-lg w-96"
+            >
+              <div>
+                <input
+                  type="text"
+                  placeholder="Nome"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded mb-2"
+                />
+              </div>
+              <div>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded mb-2"
+                />
+              </div>
+              <div>
+                <input
+                  type="date"
+                  placeholder="Data de nascimento"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded mb-2"
+                />
+              </div>
+              <div>
+                <input
+                  type="number"
+                  placeholder="Salário base"
+                  value={baseSalary}
+                  onChange={(e) => setBaseSalary(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
+                />
+              </div>
 
-      <div>
-        <Select
-          placeholder="Departamento"
-          options={departments.map((dep) => ({
-            value: dep.id,
-            label: dep.name,
-          }))}
-          onChange={handleChange}
-        />
-      </div>
+              <div>
+                <Select
+                  placeholder="Departamento"
+                  options={departments.map((dep) => ({
+                    value: dep.id,
+                    label: dep.name,
+                  }))}
+                  onChange={handleChange}
+                />
+              </div>
 
-      <div className="flex justify-end gap-2 mt-4">
-        <button
-          type="button"
-          onClick={() => setCreateSeller(false)}
-          className="text-gray-600 hover:text-gray-800"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Enviar
-        </button>
-        
-      </div>
-    </form>
-  </div>
-)}
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setCreateSeller(false)}
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                  Enviar
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );

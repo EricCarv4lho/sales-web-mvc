@@ -2,15 +2,29 @@ const API_BASE = "https://localhost:7264/api";
 
 export async function fetchDepartments() {
     const response = await fetch(`${API_BASE}/departments`);
-    if(!response.ok) throw new error("Error when searching departments.");
+    if(!response.ok) throw new Error("Error when searching departments.");
     return response.json();
 
 }
 
 export async function fetchSellers(){
   const response = await fetch(`${API_BASE}/sellers`);
-  if(!response.ok) throw new error("Error when searching sellers.")
+  if(!response.ok) throw new Error("Error when searching sellers.")
     return response.json();
+}
+
+export async function deleteSellers(id) {
+  const response = await fetch(`${API_BASE}/sellers/${id}`, {
+    method: "DELETE",
+    }
+  
+  );
+ if(!response.ok){
+  throw new Error("Erro ao deletar vendedor");
+ }
+ return true;
+
+
 }
 
 export async function createSellerApi(seller){
