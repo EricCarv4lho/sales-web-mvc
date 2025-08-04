@@ -27,6 +27,21 @@ export async function deleteSellers(id) {
 
 }
 
+
+export async function deleteDepartment(id) {
+  const response = await fetch(`${API_BASE}/departments/${id}`, {
+    method: "DELETE",
+    }
+  
+  );
+ if(!response.ok){
+  throw new Error("Erro ao deletar vendedor");
+ }
+ return true;
+
+
+}
+
 export async function createSellerApi(seller){
   const response = await fetch(`${API_BASE}/sellers`,{
     method: "POST",
