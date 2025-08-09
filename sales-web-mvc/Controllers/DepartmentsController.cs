@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Plugins;
 using SalesWebMvc.Data;
-using SalesWebMvc.Models;
 using SalesWebMvc.Dto;
+using SalesWebMvc.Models;
 namespace SalesWebMvc.Controllers
 {
     [ApiController]
@@ -44,15 +45,39 @@ namespace SalesWebMvc.Controllers
 
         // GET: api/departments/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Department>> GetDepartment(int id)
+        public async Task<ActionResult<DepartmentReadDto>> GetDepartment(int id)
         {
-            var department = await _context.Department.FindAsync(id);
+            Department department = await _context.Department.Include(d => d.Sellers).FirstOrDefaultAsync(d => d.Id == id);
             if (department == null)
             {
                 return NotFound();
             }
+            else
+            {
+                List<SellerBasicDto> listSellers = new();
+                foreach (var s in department.Sellers)
+                {
+                    SellerBasicDto sellerBasic = new SellerBasicDto{
+                        Id = s.Id,
+                        Name = s.Name,
+                        Email = s.Email
+                    };
+                       
+                   
 
-            return department;
+                    listSellers.Add(sellerBasic);
+                };
+                return new DepartmentReadDto
+                {
+                    Id = department.Id,
+                    Name = department.Name,
+                    Sellers = listSellers
+
+
+                };
+            }
+
+            
         }
 
         // POST: api/departments

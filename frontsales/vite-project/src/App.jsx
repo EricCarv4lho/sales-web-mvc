@@ -7,14 +7,17 @@ import HomePage from "./pages/HomePage";
 import DepartmentsPage from "./pages/DepartmentsPage";
 import SellersDetailsPage from "./pages/SellersDetailsPage";
 import SellersPage from "./pages/SellersPage";
+import DepartmentDetailsPage from "./pages/DepartmentsDetailsPage";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/departments" element={<DepartmentsPage />} />
+       <Route path="/departments/detalhes/:id" element={<DepartmentDetailsPage/>} />
       <Route path="/sellers" element={<SellersPage />} />
       <Route path="/sellers/detalhes/:id" element={<SellersDetailsPage/>} />
+     
     </Routes>
   );
 }

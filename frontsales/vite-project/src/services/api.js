@@ -7,6 +7,12 @@ export async function fetchDepartments() {
 
 }
 
+export async function fetchOneDepartment(id) {
+  const response = await fetch(`${API_BASE}/departments/${id}`)
+  if(!response.ok) throw new Error("Error when searching department.")
+    return response.json();
+}
+
 export async function fetchSellers(){
   const response = await fetch(`${API_BASE}/sellers`);
   if(!response.ok) throw new Error("Error when searching sellers.")
@@ -15,7 +21,7 @@ export async function fetchSellers(){
 
 export async function fetchOneSeller(id) {
    const response = await fetch(`${API_BASE}/sellers/${id}`);
-  if(!response.ok) throw new Error("Error when searching sellers.")
+  if(!response.ok) throw new Error("Error when searching seller.")
     return response.json();
 }
 

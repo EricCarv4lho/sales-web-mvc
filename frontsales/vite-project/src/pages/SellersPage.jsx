@@ -139,7 +139,7 @@ function SellersPage() {
         id="titulo"
         className=" flex flex-col items-center justify-center mt-20  p-6"
       >
-        <h1 className="text-amber-50 text-5xl font-bold  mb-8">Sellers</h1>
+        <h1 className="text-amber-50 text-5xl font-bold  mb-8">Vendedores</h1>
       </div>
 
       <div id="tabela" className="flex justify-center flex-grow ">
@@ -153,19 +153,19 @@ function SellersPage() {
               CRIAR
             </button>
             <tr className="">
-              <td className="border text-amber-50 border-gray-300 px-4 py-2">
+              <td className="border bg-blue-600 text-amber-50 border-gray-300 px-4 py-2">
                 NOME
               </td>
-              <td className="border text-amber-50 border-gray-300 px-4 py-2">
+              <td className="border bg-blue-600 text-amber-50 border-gray-300 px-4 py-2">
                 EMAIL
               </td>
-              <td className="border text-amber-50 border-gray-300 px-4 py-2">
+              <td className="border bg-blue-600 text-amber-50 border-gray-300 px-4 py-2">
                 DATA DE NASCIMENTO
               </td>
-              <td className="border text-amber-50 border-gray-300 px-4 py-2">
-                SALARIO
+              <td className="border bg-blue-600 text-amber-50 border-gray-300 px-4 py-2">
+                SALÁRIO
               </td>
-              <td className="border text-amber-50 border-gray-300 px-4 py-2">
+              <td className="border bg-blue-600 text-amber-50 font-medium border-gray-300 px-4 py-2">
                 DEPARTAMENTO
               </td>
             </tr>
@@ -183,7 +183,7 @@ function SellersPage() {
                   {new Date(sel.birthDate).toLocaleDateString('pt-BR')}
                 </td>
                 <td className="border text-amber-50 border-gray-300 px-4 py-2">
-                  {sel.baseSalary}
+                  R$ {sel.baseSalary}
                 </td>
                 <td className="border text-amber-50 border-gray-300 px-4 py-2">
                   {sel.departmentName}
@@ -293,7 +293,7 @@ function SellersPage() {
               <div>
                 <input
                   type="text"
-                  placeholder="Data de nascimento... dia/mes/ano"
+                  placeholder="Data de nascimento - dd/MM/yyyy"
                   value={birthDate}
                   onChange={(e) => setBirthDate(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded mb-2"
