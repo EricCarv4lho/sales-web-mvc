@@ -33,17 +33,29 @@ namespace SalesWebMvc.Services
             }).ToList();
         }
 
-        public Seller FindById(int? id)
+        public SellerReadDto FindById(int? id)
         {   
            
-            var seller = _context.Seller.FirstOrDefault(s => s.Id == id);
+            var seller = _context.Seller.Include(s => s.Department).FirstOrDefault(s => s.Id == id);
             if (seller == null)
             {
                 throw new KeyNotFoundException("Vendedor nao encontrado");
             }
             else
             {
-                return seller;
+                return new SellerReadDto
+                {
+                    Id = seller.Id,
+                    Name = seller.Name,
+                    Email = seller.Email,
+                    BaseSalary = seller.BaseSalary,
+                    BirthDate = seller.BirthDate,
+                    DepartmentId = seller.DepartmentId,
+                    DepartmentName = seller.Department.Name
+                };
+
+
+
             }
 
            
@@ -51,36 +63,46 @@ namespace SalesWebMvc.Services
 
         public void RemoveSeller(int id)
         {
-            var seller = FindById(id);
-           
-            
+            var seller = _context.Seller.Include(s => s.Department).FirstOrDefault(s => s.Id == id);
+            if (seller == null)
+            {
+                throw new KeyNotFoundException("Vendedor nao encontrado");
+            }
+            else
+            {
                 _context.Remove(seller);
+
+
+
+            }
+
+           
             
            
             _context.SaveChanges();
             
         }
 
-        public Seller CreateSeller(SellerCreateDto dto)
+        public SellerReadDto CreateSeller(SellerCreateDto dto, DateTime birthDateSeller)
         {
             var department = _context.Department.FirstOrDefault(d => d.Id == dto.DepartmentId);
-            if (department == null) 
-                return null;
-            var dateString = dto.BirthDate.ToString("dd/MM/yyyy h:mm:ss tt");
-            var dateConvert = DateTime.ParseExact(dateString, "dd/MM/yyyy h:mm:ss tt",
-    CultureInfo.InvariantCulture);
+            if (department == null) return null;
 
-            DateTime dataUtc = DateTime.SpecifyKind(dateConvert, DateTimeKind.Utc);
-
-            var seller = new Seller(dto.Name, dto.Email, dataUtc, dto.BaseSalary, department);
+            var seller = new Seller(dto.Name, dto.Email, birthDateSeller, dto.BaseSalary, department);
 
             _context.Seller.Add(seller);
             _context.SaveChanges();
 
-            
-            return _context.Seller
-                .Include(s => s.Department)
-                .FirstOrDefault(s => s.Id == seller.Id)!;
+            return new SellerReadDto
+            {
+                Id = seller.Id,
+                Name = seller.Name,
+                Email = seller.Email,
+                BaseSalary = seller.BaseSalary,
+                BirthDate = seller.BirthDate,
+                DepartmentId = department.Id,
+                DepartmentName = department.Name
+            };
         }
     }
 }

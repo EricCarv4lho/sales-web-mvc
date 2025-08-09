@@ -13,7 +13,7 @@ namespace SalesWebMvc.Dto
         public string Email { get; set; } = "";
 
         public double BaseSalary { get; set; } = 0;
-        public DateTime BirthDate { get; set; } = DateTime.MinValue;
+        public string BirthDate { get; set; } = "";
 
         public int DepartmentId { get; set; }
 

@@ -31,30 +31,28 @@ namespace SalesWebMvc.Controllers
         [HttpGet("{id}")]
         public IActionResult GetSeller(int id)
         {
-            Seller seller = _sellerService.FindById(id);
+            SellerReadDto seller = _sellerService.FindById(id);
             return Ok(seller);
         }
 
         [HttpPost]
         public IActionResult CreateSeller([FromBody] SellerCreateDto dto)
         {
-           
-            Seller seller = _sellerService.CreateSeller(dto);
+            DateTime birthDateSeller;
+
+            bool isDateValid = DateTime.TryParseExact(dto.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out birthDateSeller);
+            if (!isDateValid)
+                return BadRequest("BirthDate is not valid");
+
+            // Ajusta para UTC
+            birthDateSeller = DateTime.SpecifyKind(birthDateSeller, DateTimeKind.Utc);
+
+            // Passa o DTO e a data convertida para o service
+            SellerReadDto seller = _sellerService.CreateSeller(dto, birthDateSeller);
             if (seller == null)
                 return BadRequest("Department is not valid");
 
-            SellerReadDto readDto = new()
-            {
-                Id = seller.Id,
-                Name = seller.Name,
-                Email = seller.Email,
-                BaseSalary = seller.BaseSalary,
-                BirthDate = seller.BirthDate,
-                DepartmentId = seller.Department.Id,
-                DepartmentName = seller.Department.Name
-            };
-
-            return Ok(readDto);
+            return Ok(seller);
         }
         [HttpDelete("{id}")]
         public IActionResult DeleteSeller(int? id)

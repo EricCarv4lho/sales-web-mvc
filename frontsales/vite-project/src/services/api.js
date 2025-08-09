@@ -13,6 +13,12 @@ export async function fetchSellers(){
     return response.json();
 }
 
+export async function fetchOneSeller(id) {
+   const response = await fetch(`${API_BASE}/sellers/${id}`);
+  if(!response.ok) throw new Error("Error when searching sellers.")
+    return response.json();
+}
+
 export async function deleteSellers(id) {
   const response = await fetch(`${API_BASE}/sellers/${id}`, {
     method: "DELETE",
@@ -50,10 +56,12 @@ export async function createSellerApi(seller){
     },
     body: JSON.stringify(seller),
   });
-
-  if(!response.ok) {
-     throw new Error("Erro ao salvar vendedor");
+if (!response.ok) {
+    const errorText = await response.text();
+    alert(errorText); // aqui mostra o erro do backend
+    return null;
   }
+  
 
   const data = await response.json();
   return data;
