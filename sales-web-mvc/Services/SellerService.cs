@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Versioning;
 using SalesWebMvc.Data;
 using SalesWebMvc.Dto;
 using SalesWebMvc.Models;
+using SalesWebMvc.Services.Exceptions;
 using System.Globalization;
 
 namespace SalesWebMvc.Services
@@ -33,7 +35,7 @@ namespace SalesWebMvc.Services
             }).ToList();
         }
 
-        public SellerReadDto FindById(int? id)
+        public SellerReadDto FindByIdSellerReadDto(int? id)
         {   
            
             var seller = _context.Seller.Include(s => s.Department).FirstOrDefault(s => s.Id == id);
@@ -61,6 +63,25 @@ namespace SalesWebMvc.Services
            
         }
 
+        public Seller FindById(int? id)
+        {
+
+            var seller = _context.Seller.Include(s => s.Department).FirstOrDefault(s => s.Id == id);
+            if (seller == null)
+            {
+                throw new KeyNotFoundException("Vendedor nao encontrado");
+            }
+            else
+            {
+                return seller;
+
+
+
+            }
+
+
+        }
+
         public void RemoveSeller(int id)
         {
             var seller = _context.Seller.Include(s => s.Department).FirstOrDefault(s => s.Id == id);
@@ -83,10 +104,23 @@ namespace SalesWebMvc.Services
             
         }
 
-        public SellerReadDto CreateSeller(SellerCreateDto dto, DateTime birthDateSeller)
+        public SellerReadDto CreateSeller(SellerCreateDto dto)
         {
             var department = _context.Department.FirstOrDefault(d => d.Id == dto.DepartmentId);
-            if (department == null) return null;
+            if (department == null)
+            {
+                throw new NotFoundException("Id not found.");
+            }
+
+            DateTime birthDateSeller;
+
+            bool isDateValid = DateTime.TryParseExact(dto.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out birthDateSeller);
+            if (!isDateValid)
+                throw new FormatException("Birthdate is not valid.");
+
+            // Ajusta para UTC
+            birthDateSeller = DateTime.SpecifyKind(birthDateSeller, DateTimeKind.Utc);
+
 
             var seller = new Seller(dto.Name, dto.Email, birthDateSeller, dto.BaseSalary, department);
 
@@ -103,6 +137,43 @@ namespace SalesWebMvc.Services
                 DepartmentId = department.Id,
                 DepartmentName = department.Name
             };
+        }
+
+    
+        public void UpdateSeller(int id, SellerCreateDto dto)
+        {
+
+            var seller = _context.Seller.FirstOrDefault(s => s.Id == id);
+            if (seller == null)
+            {
+                throw new NotFoundException("Seller not found.");
+            }
+
+            seller.Name = dto.Name;
+            seller.Email = dto.Email;
+            seller.BaseSalary = dto.BaseSalary;
+            
+
+            if (!DateTime.TryParseExact(dto.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime birthDate))
+            {
+                throw new FormatException("Birthdate is not valid.");
+
+            }
+
+            birthDate = DateTime.SpecifyKind(birthDate, DateTimeKind.Utc);
+            seller.BirthDate = birthDate;
+
+
+            var department = _context.Department.FirstOrDefault(d => d.Id == dto.DepartmentId);
+            if (department != null)
+            {
+                seller.Department = department;
+            }
+
+            _context.SaveChanges();
+
+
+
         }
     }
 }

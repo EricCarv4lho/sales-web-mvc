@@ -6,7 +6,7 @@ namespace SalesWebMvc.Dto
     public class SellerCreateDto
     {
 
-
+       
         public string Name { get; set; } = "";
 
 

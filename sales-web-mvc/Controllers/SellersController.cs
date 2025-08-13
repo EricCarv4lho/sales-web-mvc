@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using SalesWebMvc.Dto;
 using SalesWebMvc.Models;
 using SalesWebMvc.Services;
+using SalesWebMvc.Services.Exceptions;
 using System.Globalization;
 namespace SalesWebMvc.Controllers
 {
@@ -31,29 +32,50 @@ namespace SalesWebMvc.Controllers
         [HttpGet("{id}")]
         public IActionResult GetSeller(int id)
         {
-            SellerReadDto seller = _sellerService.FindById(id);
+            SellerReadDto seller = _sellerService.FindByIdSellerReadDto(id);
             return Ok(seller);
         }
 
         [HttpPost]
         public IActionResult CreateSeller([FromBody] SellerCreateDto dto)
         {
-            DateTime birthDateSeller;
-
-            bool isDateValid = DateTime.TryParseExact(dto.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out birthDateSeller);
-            if (!isDateValid)
-                return BadRequest("BirthDate is not valid");
-
-            // Ajusta para UTC
-            birthDateSeller = DateTime.SpecifyKind(birthDateSeller, DateTimeKind.Utc);
-
+          
             // Passa o DTO e a data convertida para o service
-            SellerReadDto seller = _sellerService.CreateSeller(dto, birthDateSeller);
+            SellerReadDto seller = _sellerService.CreateSeller(dto);
             if (seller == null)
                 return BadRequest("Department is not valid");
 
             return Ok(seller);
         }
+        
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateSeller(int id, SellerCreateDto dto)
+        {
+         
+         
+
+            try   
+            {
+                
+                _sellerService.UpdateSeller(id ,dto);
+                return NoContent();
+
+            }
+            catch(NotFoundException)
+            {
+                return NotFound();
+            }
+
+            catch (DbConcurrencyException)
+            {
+                return BadRequest();
+            }
+            
+       
+
+        }
+
         [HttpDelete("{id}")]
         public IActionResult DeleteSeller(int? id)
         {
