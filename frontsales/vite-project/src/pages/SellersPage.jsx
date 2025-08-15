@@ -76,6 +76,7 @@ function SellersPage() {
 
   const handleChange = (e) => {
     setDepartmentId(e.value);
+    console.log(e.value)
   };
 
   const [openModalDelete, setOpenModalDelete] = useState(false);
@@ -193,7 +194,7 @@ function SellersPage() {
                     id="botoes"
                     className=" flex flex-row justify-center gap-5"
                   >
-                    <Link to={`/sellers/editar/${sel.id}`}>
+                    <Link to={`/sellers/edit/${sel.id}`}>
                       {" "}
                       <button
                         type="button"
@@ -203,7 +204,7 @@ function SellersPage() {
                       </button>
                     </Link>
 
-                    <Link to={`/sellers/detalhes/${sel.id}`}>
+                    <Link to={`/sellers/details/${sel.id}`}>
                       <button
                         type="button"
                         className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"

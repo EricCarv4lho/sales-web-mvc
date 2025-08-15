@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { fetchOneDepartment } from "../services/api";
 function DepartmentDetailsPage() {
-const { id } = useParams();
 
+const { id } = useParams();
 const [department, setDepartment] = useState({});
 
   useEffect(() => {

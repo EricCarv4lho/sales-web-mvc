@@ -8,7 +8,7 @@ import DepartmentsPage from "./pages/DepartmentsPage";
 import SellersDetailsPage from "./pages/SellersDetailsPage";
 import SellersPage from "./pages/SellersPage";
 import DepartmentDetailsPage from "./pages/DepartmentsDetailsPage";
-
+import SellersEditPage from "./pages/SellersEditPage";
 function App() {
   return (
     <Routes>
@@ -16,7 +16,8 @@ function App() {
       <Route path="/departments" element={<DepartmentsPage />} />
        <Route path="/departments/detalhes/:id" element={<DepartmentDetailsPage/>} />
       <Route path="/sellers" element={<SellersPage />} />
-      <Route path="/sellers/detalhes/:id" element={<SellersDetailsPage/>} />
+      <Route path="/sellers/details/:id" element={<SellersDetailsPage/>} />
+      <Route path="/sellers/edit/:id" element={<SellersEditPage/>} />
      
     </Routes>
   );

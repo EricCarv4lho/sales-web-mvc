@@ -25,7 +25,7 @@ namespace SalesWebMvc.Controllers
        
         public IActionResult GetSellers()
         {
-            List<SellerReadDto> list = _sellerService.findAllDtos();
+            List<SellerReadDto> list = _sellerService.FindAllDtos();
             return Ok(list);
         }
 
@@ -39,13 +39,17 @@ namespace SalesWebMvc.Controllers
         [HttpPost]
         public IActionResult CreateSeller([FromBody] SellerCreateDto dto)
         {
-          
-            // Passa o DTO e a data convertida para o service
-            SellerReadDto seller = _sellerService.CreateSeller(dto);
-            if (seller == null)
-                return BadRequest("Department is not valid");
 
-            return Ok(seller);
+            // Passa o DTO e a data convertida para o service
+            try
+            {
+                SellerReadDto seller = _sellerService.CreateSeller(dto);
+                return Ok(seller);
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         
 

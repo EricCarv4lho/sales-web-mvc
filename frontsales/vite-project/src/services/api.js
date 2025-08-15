@@ -25,6 +25,32 @@ export async function fetchOneSeller(id) {
     return response.json();
 }
 
+
+export async function updateSeller(id ,seller) {
+  try {
+    const response = await fetch(`${API_BASE}/sellers/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(seller), 
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      alert(errorText);
+      return null;
+    }
+
+    // Se for 204, só retorna null ou uma flag de sucesso
+    return null;
+  } catch (error) {
+    alert("Erro ao atualizar o vendedor.");
+    console.error("Erro no updateSeller:", error);
+    return null;
+  }
+}
+
 export async function deleteSellers(id) {
   const response = await fetch(`${API_BASE}/sellers/${id}`, {
     method: "DELETE",

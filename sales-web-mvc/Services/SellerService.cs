@@ -19,7 +19,7 @@ namespace SalesWebMvc.Services
             _context = context;
         }
 
-        public List<SellerReadDto> findAllDtos()
+        public List<SellerReadDto> FindAllDtos()
         {
             var sellers = _context.Seller.Include(s => s.Department).ToList();
 
@@ -36,8 +36,8 @@ namespace SalesWebMvc.Services
         }
 
         public SellerReadDto FindByIdSellerReadDto(int? id)
-        {   
-           
+        {
+
             var seller = _context.Seller.Include(s => s.Department).FirstOrDefault(s => s.Id == id);
             if (seller == null)
             {
@@ -60,7 +60,7 @@ namespace SalesWebMvc.Services
 
             }
 
-           
+
         }
 
         public Seller FindById(int? id)
@@ -97,11 +97,11 @@ namespace SalesWebMvc.Services
 
             }
 
-           
-            
-           
+
+
+
             _context.SaveChanges();
-            
+
         }
 
         public SellerReadDto CreateSeller(SellerCreateDto dto)
@@ -112,11 +112,17 @@ namespace SalesWebMvc.Services
                 throw new NotFoundException("Id not found.");
             }
 
-            DateTime birthDateSeller;
+            if (dto.BaseSalary < 0)
+            {
+                throw new BusinessException("BaseSalary cannot be less than 0");
 
-            bool isDateValid = DateTime.TryParseExact(dto.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out birthDateSeller);
+            }
+
+
+
+            bool isDateValid = DateTime.TryParseExact(dto.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime birthDateSeller);
             if (!isDateValid)
-                throw new FormatException("Birthdate is not valid.");
+                throw new BusinessException("Birthdate is not valid.");
 
             // Ajusta para UTC
             birthDateSeller = DateTime.SpecifyKind(birthDateSeller, DateTimeKind.Utc);
@@ -139,20 +145,15 @@ namespace SalesWebMvc.Services
             };
         }
 
-    
+
         public void UpdateSeller(int id, SellerCreateDto dto)
         {
 
-            var seller = _context.Seller.FirstOrDefault(s => s.Id == id);
-            if (seller == null)
-            {
-                throw new NotFoundException("Seller not found.");
-            }
-
+            var seller = _context.Seller.FirstOrDefault(s => s.Id == id) ?? throw new NotFoundException("Seller not found.");
             seller.Name = dto.Name;
             seller.Email = dto.Email;
             seller.BaseSalary = dto.BaseSalary;
-            
+
 
             if (!DateTime.TryParseExact(dto.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime birthDate))
             {
