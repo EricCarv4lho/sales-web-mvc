@@ -184,7 +184,7 @@ function SellersPage() {
                   {new Date(sel.birthDate).toLocaleDateString('pt-BR')}
                 </td>
                 <td className="border text-amber-50 border-gray-300 px-4 py-2">
-                  R$ {sel.baseSalary}
+                 {sel.baseSalary.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </td>
                 <td className="border text-amber-50 border-gray-300 px-4 py-2">
                   {sel.departmentName}

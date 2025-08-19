@@ -23,28 +23,27 @@ namespace SalesWebMvc.Controllers
 
         [HttpGet]
        
-        public IActionResult GetSellers()
+        public async Task<IActionResult> GetSellers()
         {
-            List<SellerReadDto> list = _sellerService.FindAllDtos();
+            List<SellerReadDto> list = await _sellerService.FindAllAsync();
             return Ok(list);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetSeller(int id)
+        public async Task<IActionResult> GetSellerById(int id)
         {
-            SellerReadDto seller = _sellerService.FindByIdSellerReadDto(id);
+            SellerReadDto seller = await _sellerService.FindByIdDtoAsync(id);
             return Ok(seller);
         }
 
         [HttpPost]
-        public IActionResult CreateSeller([FromBody] SellerCreateDto dto)
+        public async Task<IActionResult> CreateSeller([FromBody] SellerCreateDto dto)
         {
 
-            // Passa o DTO e a data convertida para o service
             try
             {
-                SellerReadDto seller = _sellerService.CreateSeller(dto);
-                return Ok(seller);
+                SellerReadDto seller = await _sellerService.CreateSellerAsync(dto);
+                return CreatedAtAction(nameof(GetSellerById), new { id = seller.Id }, seller);
             }
             catch (BusinessException ex)
             {
@@ -54,7 +53,7 @@ namespace SalesWebMvc.Controllers
         
 
         [HttpPut("{id}")]
-        public IActionResult UpdateSeller(int id, SellerCreateDto dto)
+        public async Task<IActionResult> UpdateSeller(int id, SellerCreateDto dto)
         {
          
          
@@ -62,7 +61,7 @@ namespace SalesWebMvc.Controllers
             try   
             {
                 
-                _sellerService.UpdateSeller(id ,dto);
+                await _sellerService.UpdateSellerAsync(id ,dto);
                 return NoContent();
 
             }
@@ -81,18 +80,23 @@ namespace SalesWebMvc.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteSeller(int? id)
+        public async Task<IActionResult> DeleteSeller(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-            else
+            try
             {
-                _sellerService.RemoveSeller(id.Value);
+                await _sellerService.RemoveSellerAsync(id.Value);
+                return Ok();
             }
 
-            return Ok();
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+
         }
 
     }

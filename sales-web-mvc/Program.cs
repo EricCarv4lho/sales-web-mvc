@@ -2,6 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SalesWebMvc.Data;
 using SalesWebMvc.Services;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +20,7 @@ builder.Services.AddDbContext<SalesWebMvcContext>(options =>
 // Injeção de dependências
 //builder.Services.AddScoped<SeedingService>();
 builder.Services.AddScoped<SellerService>();
+builder.Services.AddScoped<DepartmentsService>();
 
 // Controllers e Swagger
 builder.Services.AddControllers();
@@ -34,8 +38,18 @@ builder.Services.AddCors(options =>
     });
 });
 
-var app = builder.Build();
+var ptBR = new CultureInfo("pt-BR");
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(ptBR),
+    SupportedCultures = new List<CultureInfo> { ptBR },
+    SupportedUICultures = new List<CultureInfo> { ptBR },
+};
 
+
+    
+var app = builder.Build();
+app.UseRequestLocalization(localizationOptions);
 // Seed do banco (dados iniciais)
 /*using (var scope = app.Services.CreateScope())
 {

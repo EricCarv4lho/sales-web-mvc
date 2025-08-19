@@ -19,97 +19,88 @@ namespace SalesWebMvc.Services
             _context = context;
         }
 
-        public List<SellerReadDto> FindAllDtos()
+        public async Task<List<SellerReadDto>> FindAllAsync()
         {
-            var sellers = _context.Seller.Include(s => s.Department).ToList();
-
-            return sellers.Select(s => new SellerReadDto
+            var sellers = await _context.Seller.Select(s => new SellerReadDto
             {
                 Id = s.Id,
                 Name = s.Name,
                 Email = s.Email,
                 BaseSalary = s.BaseSalary,
                 BirthDate = s.BirthDate,
-                DepartmentId = s.Department.Id,
+                DepartmentId = s.DepartmentId,
                 DepartmentName = s.Department.Name
-            }).ToList();
+            }).ToListAsync();
+
+            return sellers;
         }
 
-        public SellerReadDto FindByIdSellerReadDto(int? id)
+        public async Task<SellerReadDto> FindByIdDtoAsync (int? id)
         {
 
-            var seller = _context.Seller.Include(s => s.Department).FirstOrDefault(s => s.Id == id);
-            if (seller == null)
+            SellerReadDto? sellerRead = await _context.Seller.Where(s => s.Id == id).Select(seller => new SellerReadDto
             {
-                throw new KeyNotFoundException("Vendedor nao encontrado");
+                Id = seller.Id,
+                Name = seller.Name,
+                Email = seller.Email,
+                BaseSalary = seller.BaseSalary,
+                BirthDate = seller.BirthDate,
+                DepartmentId = seller.DepartmentId,
+                DepartmentName = seller.Department.Name
+            }).FirstOrDefaultAsync();
+
+            if (sellerRead == null)
+            {
+                throw new NotFoundException("Seller not found.");
             }
             else
             {
-                return new SellerReadDto
-                {
-                    Id = seller.Id,
-                    Name = seller.Name,
-                    Email = seller.Email,
-                    BaseSalary = seller.BaseSalary,
-                    BirthDate = seller.BirthDate,
-                    DepartmentId = seller.DepartmentId,
-                    DepartmentName = seller.Department.Name
-                };
-
-
-
+                return sellerRead;
             }
+            
+
+        }
+
+        public async Task<Seller> FindByIdAsync(int? id)
+        {
+
+            Seller? seller = await _context.Seller.Where(s => s.Id == id).Include(s => s.Department).FirstOrDefaultAsync();
+            if (seller == null)
+            {
+                throw new NotFoundException("Seller not found.");
+            }
+
+            return seller;
 
 
         }
 
-        public Seller FindById(int? id)
+        public async Task RemoveSellerAsync (int id)
         {
-
-            var seller = _context.Seller.Include(s => s.Department).FirstOrDefault(s => s.Id == id);
+            Seller? seller = await _context.Seller.FirstOrDefaultAsync(s => s.Id == id);
             if (seller == null)
             {
-                throw new KeyNotFoundException("Vendedor nao encontrado");
-            }
-            else
-            {
-                return seller;
-
-
-
-            }
-
-
-        }
-
-        public void RemoveSeller(int id)
-        {
-            var seller = _context.Seller.Include(s => s.Department).FirstOrDefault(s => s.Id == id);
-            if (seller == null)
-            {
-                throw new KeyNotFoundException("Vendedor nao encontrado");
+                throw new NotFoundException("Seller not found.");
             }
             else
             {
                 _context.Remove(seller);
 
-
-
             }
 
 
 
 
-            _context.SaveChanges();
+           await _context.SaveChangesAsync();
 
         }
 
-        public SellerReadDto CreateSeller(SellerCreateDto dto)
+        public async Task<SellerReadDto> CreateSellerAsync(SellerCreateDto dto)
         {
-            var department = _context.Department.FirstOrDefault(d => d.Id == dto.DepartmentId);
+            Department? department = await _context.Department.FirstOrDefaultAsync(d => d.Id == dto.DepartmentId);
             if (department == null)
             {
-                throw new NotFoundException("Id not found.");
+                throw new BusinessException("Department not provided");
             }
 
             if (dto.BaseSalary < 0)
@@ -117,7 +108,7 @@ namespace SalesWebMvc.Services
                 throw new BusinessException("BaseSalary cannot be less than 0");
 
             }
-
+             
 
 
             bool isDateValid = DateTime.TryParseExact(dto.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime birthDateSeller);
@@ -128,28 +119,32 @@ namespace SalesWebMvc.Services
             birthDateSeller = DateTime.SpecifyKind(birthDateSeller, DateTimeKind.Utc);
 
 
-            var seller = new Seller(dto.Name, dto.Email, birthDateSeller, dto.BaseSalary, department);
+            Seller seller = new(dto.Name, dto.Email, birthDateSeller, dto.BaseSalary, department);
 
             _context.Seller.Add(seller);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            return new SellerReadDto
+            SellerReadDto sellerReadDto = new SellerReadDto
             {
                 Id = seller.Id,
                 Name = seller.Name,
                 Email = seller.Email,
                 BaseSalary = seller.BaseSalary,
                 BirthDate = seller.BirthDate,
-                DepartmentId = department.Id,
-                DepartmentName = department.Name
+                DepartmentId = seller.DepartmentId,
+                DepartmentName = seller.Department.Name
+
             };
+
+            return sellerReadDto;
+           
         }
 
 
-        public void UpdateSeller(int id, SellerCreateDto dto)
+        public async Task UpdateSellerAsync(int id, SellerCreateDto dto)
         {
 
-            var seller = _context.Seller.FirstOrDefault(s => s.Id == id) ?? throw new NotFoundException("Seller not found.");
+           Seller seller =  await _context.Seller.FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException("Id not found.");
             seller.Name = dto.Name;
             seller.Email = dto.Email;
             seller.BaseSalary = dto.BaseSalary;
@@ -165,14 +160,14 @@ namespace SalesWebMvc.Services
             seller.BirthDate = birthDate;
 
 
-            var department = _context.Department.FirstOrDefault(d => d.Id == dto.DepartmentId);
+            Department? department = await _context.Department.FirstOrDefaultAsync(d => d.Id == dto.DepartmentId);
             if (department != null)
             {
                 seller.Department = department;
             }
 
-            _context.SaveChanges();
-
+            await _context.SaveChangesAsync();
+            
 
 
         }

@@ -162,13 +162,15 @@ function SellersEditPage() {
         <div className="flex justify-end gap-2 mt-4">
           <Link to={"/sellers"}><button  type="button" className="text-gray-600 hover:text-gray-800 px-4 py-2">
             Cancelar
-          </button></Link>
-          <button
+          </button></Link> 
+           <Link to={"/sellers"}><button
             type="submit"
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
+          onClick= {() => alert("Vendedor atualizado com sucesso!")
+            
+          }>
             Atualizar
-          </button>
+          </button></Link>
         </div>
       </form>
     </div>

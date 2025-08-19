@@ -4,17 +4,20 @@ using NuGet.Protocol.Plugins;
 using SalesWebMvc.Data;
 using SalesWebMvc.Dto;
 using SalesWebMvc.Models;
+using SalesWebMvc.Services;
+using SalesWebMvc.Services.Exceptions;
+using System.Net;
 namespace SalesWebMvc.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class DepartmentsController : ControllerBase
     {
-        private readonly SalesWebMvcContext _context;
+        private readonly DepartmentsService _service;
 
-        public DepartmentsController(SalesWebMvcContext context)
+        public DepartmentsController(DepartmentsService service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET: api/departments
@@ -22,23 +25,9 @@ namespace SalesWebMvc.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DepartmentReadDto>>> GetDepartments()
         {
-            var departments = await _context.Department
-                .Include(d => d.Sellers)
-                .ToListAsync();
+            List<DepartmentReadDto> departmentsDtoList = await _service.FindAllAsync();
 
-            var dtoList = departments.Select(d => new DepartmentReadDto
-            {
-                Id = d.Id,
-                Name = d.Name,
-                Sellers = d.Sellers.Select(s => new SellerBasicDto
-                {
-                    Id = s.Id,
-                    Name = s.Name,
-                    Email = s.Email
-                }).ToList()
-            });
-
-            return Ok(dtoList);
+            return Ok(departmentsDtoList);
         }
 
 
@@ -47,35 +36,13 @@ namespace SalesWebMvc.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<DepartmentReadDto>> GetDepartment(int id)
         {
-            Department department = await _context.Department.Include(d => d.Sellers).FirstOrDefaultAsync(d => d.Id == id);
-            if (department == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                List<SellerBasicDto> listSellers = new();
-                foreach (var s in department.Sellers)
-                {
-                    SellerBasicDto sellerBasic = new SellerBasicDto{
-                        Id = s.Id,
-                        Name = s.Name,
-                        Email = s.Email
-                    };
-                       
-                   
-
-                    listSellers.Add(sellerBasic);
-                };
-                return new DepartmentReadDto
-                {
-                    Id = department.Id,
-                    Name = department.Name,
-                    Sellers = listSellers
 
 
-                };
-            }
+
+            DepartmentReadDto departmentDto = await _service.FindByIdAsync(id);
+
+            
+            return Ok(departmentDto);
 
             
         }
@@ -83,68 +50,57 @@ namespace SalesWebMvc.Controllers
         // POST: api/departments
         
         [HttpPost]
-        public async Task<ActionResult<Department>> PostDepartment(DepartmentCreateDto dto)
-        {
-            var department = new Department
-            {
-                Name = dto.Name
-            };
+        public async Task<ActionResult<DepartmentReadDto>> PostDepartment(DepartmentCreateDto dto)
+        {   
+            DepartmentReadDto departmentRead = await _service.CreateDepartmentAsync(dto);
 
-            _context.Department.Add(department);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetDepartment), new { id = department.Id }, department);
+            return CreatedAtAction(nameof(GetDepartment), new { id = departmentRead.Id }, departmentRead);
         }
 
         // PUT: api/departments/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutDepartment(int id, Department department)
+        public async Task<IActionResult> PutDepartment(int id, DepartmentCreateDto departmentDto)
         {
-            if (id != department.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(department).State = EntityState.Modified;
+            
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _service.UpdateDepartmentAsync(id, departmentDto);
+                return NoContent();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DepartmentExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // DELETE: api/departments/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDepartment(int id)
-        {
-            var department = await _context.Department.FindAsync(id);
-            if (department == null)
+            catch (NotFoundException)
             {
                 return NotFound();
             }
 
-            _context.Department.Remove(department);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (DbConcurrencyException)
+            {
+                return BadRequest();
+            }
+            
+           
         }
 
-        private bool DepartmentExists(int id)
+        // DELETE: api/departments/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDepartment(int? id)
         {
-            return _context.Department.Any(e => e.Id == id);
+            if (id == null)
+            {
+                return NotFound();
+            }
+            try
+            {
+                await _service.DeleteDepartmentAsync(id);
+                return Ok();
+            }
+
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
         }
+
+       
     }
 }
