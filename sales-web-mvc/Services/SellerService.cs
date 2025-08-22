@@ -98,6 +98,13 @@ namespace SalesWebMvc.Services
         public async Task<SellerReadDto> CreateSellerAsync(SellerCreateDto dto)
         {
             Department? department = await _context.Department.FirstOrDefaultAsync(d => d.Id == dto.DepartmentId);
+            bool emailExists = await _context.Seller.AnyAsync(s => s.Email == dto.Email);
+
+            if (emailExists)
+            {
+                throw new BusinessException("Emails already exists.");
+                
+            }
             if (department == null)
             {
                 throw new BusinessException("Department not provided");
@@ -109,7 +116,7 @@ namespace SalesWebMvc.Services
 
             }
              
-
+                                                                                                   
 
             bool isDateValid = DateTime.TryParseExact(dto.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime birthDateSeller);
             if (!isDateValid)
@@ -145,6 +152,21 @@ namespace SalesWebMvc.Services
         {
 
            Seller seller =  await _context.Seller.FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException("Id not found.");
+
+            bool emailExists = await _context.Seller.AnyAsync(s => s.Email == dto.Email && s.Id != id);
+            if (emailExists)
+            {
+                throw new BusinessException("Emails already exists.");
+
+            }
+            
+
+            if (dto.BaseSalary < 0)
+            {
+                throw new BusinessException("BaseSalary cannot be less than 0");
+
+            }
+
             seller.Name = dto.Name;
             seller.Email = dto.Email;
             seller.BaseSalary = dto.BaseSalary;

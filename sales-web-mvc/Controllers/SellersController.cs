@@ -65,17 +65,24 @@ namespace SalesWebMvc.Controllers
                 return NoContent();
 
             }
-            catch(NotFoundException)
+            catch(NotFoundException ex)
             {
-                return NotFound();
+                return BadRequest(new { message = ex.Message });
+
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+
             }
 
-            catch (DbConcurrencyException)
+            catch (DbConcurrencyException ex)
             {
-                return BadRequest();
+                return BadRequest(new { message = ex.Message });
+
             }
-            
-       
+
+
 
         }
 

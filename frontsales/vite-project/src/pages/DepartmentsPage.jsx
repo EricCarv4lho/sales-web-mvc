@@ -3,16 +3,15 @@ import { fetchDepartments } from "../services/api";
 import { Link } from "react-router-dom";
 import { createDepartmentApi } from "../services/api";
 import { deleteDepartment } from "../services/api";
+import { useNavigate } from "react-router-dom";
+
 function DepartmentsPage() {
   const [departments, setDepartments] = useState([]);
   const [departmentId, setDepartmentId] = useState(0);
   const [createDepartment, setCreateDepartment] = useState(false);
   const [departmentName, setDepartmentName] = useState("");
   const [openModalDelete, setOpenModalDelete] = useState(false);
-  
- 
-
-
+  const navigate = useNavigate();
   useEffect(() => {
     fetchDepartments()
       .then((data) => setDepartments(data))
@@ -93,7 +92,7 @@ function DepartmentsPage() {
               CRIAR
             </button>
             {departments.map((dep) => (
-              <tr key={dep.id} >
+              <tr key={dep.id}>
                 <td className="border text-amber-50 border-gray-300 px-4 py-2">
                   {dep.name}
                 </td>
@@ -123,14 +122,11 @@ function DepartmentsPage() {
                   <button
                     type="button"
                     className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                    
-                      onClick={() => { setOpenModalDelete(true);
-                        setDepartmentId(dep.id)
-                        console.log(dep.id)
-                      }
-                      }
-
-                    
+                    onClick={() => {
+                      setOpenModalDelete(true);
+                      setDepartmentId(dep.id);
+                      console.log(dep.id);
+                    }}
                   >
                     Deletar
                   </button>
@@ -166,7 +162,6 @@ function DepartmentsPage() {
                 <button
                   onClick={async () => {
                     const trimedName = departmentName.trim();
-                    console.log(trimedName);
                     if (!trimedName) {
                       alert("Type a valid name to department.");
                       return;
@@ -176,14 +171,17 @@ function DepartmentsPage() {
                       const createdDepartment = await createDepartmentApi({
                         name: trimedName,
                       });
-                      setDepartments([...departments, createdDepartment]);
-                      setDepartmentName("");
 
-                      setCreateDepartment(false);
+                      if (createdDepartment) {
+                        setDepartments([...departments, createdDepartment]);
+                        setDepartmentName("");
+                        setCreateDepartment(false);
+                        alert("Departamento criado com sucesso!");
+                        navigate("/departments");
+                      }
+                      // Se for null, o alert de erro já foi mostrado na API e nada acontece
                     } catch (error) {
-                      console.error(
-                        "Error ocurred when creating a new department.."
-                      );
+                      console.error("Error ocurred when creating a new department..");
                     }
                   }}
                   className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
@@ -210,8 +208,6 @@ function DepartmentsPage() {
                   Cancelar
                 </button>
                 <button
-
-                
                   onClick={async () => {
                     try {
                       await deleteDepartment(departmentId);

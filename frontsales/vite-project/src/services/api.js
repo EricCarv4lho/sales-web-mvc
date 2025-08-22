@@ -36,19 +36,59 @@ export async function updateSeller(id ,seller) {
       body: JSON.stringify(seller), 
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      alert(errorText);
-      return null;
+    if (response.status === 204) {
+      return true;
+    }
+    if(response.ok) {
+      return await response.json();
+    }
+    
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Erro ao atualizar o vendedor.");
+  } catch (error) {
+    console.error("Erro no updateSeller", error);
+    
+    throw error;
+  }
+
+    
+  
+  
+
+   
+
+   
+ 
+}
+
+
+export async function updateDepartment(id, department) {
+  try {
+    const response = await fetch(`${API_BASE}/departments/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(department)
+    });
+
+    if (response.status === 204) {
+      return true;
     }
 
-    // Se for 204, só retorna null ou uma flag de sucesso
-    return null;
+    if (response.ok) {
+      return await response.json();
+    }
+
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Erro ao atualizar o vendedor.");
   } catch (error) {
-    alert("Erro ao atualizar o vendedor.");
-    console.error("Erro no updateSeller:", error);
-    return null;
+    console.error("Erro no updateSeller", error);
+    
+    throw error;
   }
+
+ 
 }
 
 export async function deleteSellers(id) {
@@ -108,12 +148,16 @@ export async function createDepartmentApi(department) {
     body: JSON.stringify(department),
   });
 
-  if (!response.ok) {
+ if (!response.ok) {
     const errorText = await response.text();
-    console.error("Erro da API:", errorText);
-    throw new Error("Erro ao salvar departamento");
+    alert(errorText); // aqui mostra o erro do backend
+    return null;
   }
+
+
 
   const data = await response.json();
   return data;
 }
+
+

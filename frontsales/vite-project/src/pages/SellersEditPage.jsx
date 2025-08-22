@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import {
   fetchDepartments,
@@ -11,7 +11,7 @@ import Select from "react-select";
 
 function SellersEditPage() {
   const { id } = useParams();
-
+  const navigate = useNavigate();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -20,16 +20,16 @@ function SellersEditPage() {
   const [departments, setDepartments] = useState([]);
   const [departmentId, setDepartmentId] = useState(0);
   const [sellers, setSellers] = useState([]);
- const [departmentName, setDepartmentName] = useState("")
+  const [departmentName, setDepartmentName] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState(null);
- const [seller, setSeller] = useState({});
+  const [seller, setSeller] = useState({});
+
   useEffect(() => {
     fetchOneSeller(id)
       .then((data) => {
-        
         setName(data.name);
         setEmail(data.email);
-        setBirthDate(new Date(data.birthDate).toLocaleDateString('pt-BR'));
+        setBirthDate(new Date(data.birthDate).toLocaleDateString("pt-BR"));
         setBaseSalary(data.baseSalary);
         setDepartmentName(data.departmentName);
         setDepartmentId(data.departmentId);
@@ -70,7 +70,7 @@ function SellersEditPage() {
         departmentId,
       });
 
-      if (wasUpdated === null) {
+      if (wasUpdated) {
         // Atualiza a lista localmente sem depender da resposta da API
         const updatedList = sellers.map((seller) =>
           seller.id === id
@@ -87,13 +87,16 @@ function SellersEditPage() {
 
         setSellers(updatedList);
 
-        alert("Vendedor atualizado com sucesso!")
-
+        alert("Vendedor atualizado com sucesso!");
+        navigate("/sellers");
         return;
+      }
+      else {
+        alert("Erro ao atualizar.");
       }
     } catch (error) {
       console.error("Erro ao atualizar vendedor:", error);
-      alert("Erro ao atualizar vendedor.");
+      alert(error.message || "Erro ao atualizar vendedor.");
     }
   };
 
@@ -105,11 +108,13 @@ function SellersEditPage() {
 
   return (
     <div className="flex  flex-col justify-center items-center">
-      <h1 className="text-2xl font-bold m-20 text-amber-50">Edite as informações abaixo:</h1>
+      <h1 className="text-2xl font-bold m-20 text-amber-50">
+        Edite as informações abaixo:
+      </h1>
 
       <form
-        onSubmit={handleSubmit}
         className="bg-white p-6 rounded shadow-lg w-96"
+        onSubmit={handleSubmit}
       >
         <div>
           <input
@@ -160,17 +165,22 @@ function SellersEditPage() {
         </div>
 
         <div className="flex justify-end gap-2 mt-4">
-          <Link to={"/sellers"}><button  type="button" className="text-gray-600 hover:text-gray-800 px-4 py-2">
-            Cancelar
-          </button></Link> 
-           <Link to={"/sellers"}><button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          onClick= {() => alert("Vendedor atualizado com sucesso!")
-            
-          }>
-            Atualizar
-          </button></Link>
+          <Link to={"/sellers"}>
+            <button
+              type="button"
+              className="text-gray-600 hover:text-gray-800 px-4 py-2"
+            >
+              Cancelar
+            </button>
+          </Link>
+        
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Atualizar
+            </button>
+          
         </div>
       </form>
     </div>

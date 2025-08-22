@@ -37,7 +37,7 @@ function SellersPage() {
   const [departmentId, setDepartmentId] = useState(0);
   const handleSubmit = async (e) => {
     e.preventDefault();
- 
+     
     const trimmedName = name.trim();
     const trimmedEmail = email.trim();
 
@@ -68,6 +68,9 @@ function SellersPage() {
       setBirthDate("");
       setBaseSalary("");
       setCreateSeller(false);
+      navigate("/sellers");
+      alert("Vendedor criado com sucesso!");
+      
     } catch (error) {
       console.error("Erro ao criar vendedor:", error);
       alert("Erro ao criar vendedor.");

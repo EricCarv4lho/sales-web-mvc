@@ -51,10 +51,17 @@ namespace SalesWebMvc.Controllers
         
         [HttpPost]
         public async Task<ActionResult<DepartmentReadDto>> PostDepartment(DepartmentCreateDto dto)
-        {   
-            DepartmentReadDto departmentRead = await _service.CreateDepartmentAsync(dto);
+        {
+            try
+            {
+                DepartmentReadDto departmentRead = await _service.CreateDepartmentAsync(dto);
 
-            return CreatedAtAction(nameof(GetDepartment), new { id = departmentRead.Id }, departmentRead);
+                return CreatedAtAction(nameof(GetDepartment), new { id = departmentRead.Id }, departmentRead);
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // PUT: api/departments/5
@@ -68,17 +75,24 @@ namespace SalesWebMvc.Controllers
                 await _service.UpdateDepartmentAsync(id, departmentDto);
                 return NoContent();
             }
-            catch (NotFoundException)
+            catch (NotFoundException ex)
             {
-                return NotFound();
+                return BadRequest(new { message = ex.Message });
+
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+
             }
 
-            catch (DbConcurrencyException)
+            catch (DbConcurrencyException ex)
             {
-                return BadRequest();
+                return BadRequest(new { message = ex.Message });
+
             }
-            
-           
+
+
         }
 
         // DELETE: api/departments/5

@@ -78,6 +78,14 @@ namespace SalesWebMvc.Services
                 throw new BusinessException("Invalid name.");
             }
 
+
+            bool nameExists = await _context.Department
+                .AnyAsync(d => d.Name == dto.Name);
+
+            if (nameExists)
+                throw new BusinessException("A department with this name already exists.");
+
+
             Department department = new(dto.Name);
 
             _context.Department.Add(department);
@@ -89,7 +97,7 @@ namespace SalesWebMvc.Services
                 Name = department.Name,
                 Sellers = department.Sellers.Select(s => new SellerBasicDto { Id = s.Id, Name = s.Name, Email = s.Email }).ToList()
             };
-
+            
             return departmentRead;
         }
 
@@ -97,15 +105,28 @@ namespace SalesWebMvc.Services
 
         public async Task UpdateDepartmentAsync(int id, DepartmentCreateDto dto)
         {
-            if (dto.Name == null)
-                throw new BusinessException("Invalid name.");
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                throw new BusinessException("Invalid department name");
 
-            Department? department = await _context.Department.FirstOrDefaultAsync(d => d.Id == id) ?? throw new NotFoundException("Id not found.");
-            department.Name = dto.Name;
+            var department = await _context.Department
+                .FirstOrDefaultAsync(d => d.Id == id)
+                ?? throw new NotFoundException("Id not found.");
+
+            
+            if (dto.Name == department.Name)
+                return;
+
+            
+            bool nameExists = await _context.Department
+                .AnyAsync(d => d.Name == dto.Name && d.Id != id);
+
+            if (nameExists)
+                throw new BusinessException("A department with this name already exists.");
+
+            department.Name = dto.Name; 
             _context.Entry(department).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
-            
         }
 
         public async Task DeleteDepartmentAsync(int? id)
