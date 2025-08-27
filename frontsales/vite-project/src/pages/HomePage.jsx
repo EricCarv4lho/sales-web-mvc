@@ -41,7 +41,13 @@ function HomePage() {
                     Vendedores
                   </Link>
                 </li>
-                
+              <li>
+                    <Link to={"/sales"} className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">
+
+                  
+                    Vendas
+                  </Link>
+                </li>
                 <li>
                   <a
                     href="#"
