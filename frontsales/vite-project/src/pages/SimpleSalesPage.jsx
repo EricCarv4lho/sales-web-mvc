@@ -4,48 +4,46 @@ import { useEffect, useState } from "react";
 import { fetchSales } from "../services/api";
 import { useSearchParams } from "react-router-dom";
 
-
 function SimpleSalesPage() {
   const [simpleStartDate, setSimpleStartDate] = useState(null);
   const [simpleFinalDate, setSimpleFinalDate] = useState(null);
-  const [groupStartDate, setGroupStartDate] = useState(null);
-  const [groupFinalDate, setGroupFinalDate] = useState(null);
+ 
   const [searchParams] = useSearchParams();
   const [sales, setSales] = useState([]);
- 
-    function formatDate(date) {
+
+  function formatDate(date) {
     return date?.toISOString().split("T")[0]; // yyyy-MM-dd
   }
-  
 
   useEffect(() => {
-  const start = searchParams.get("startDate");
-  const end = searchParams.get("finalDate");
+    const start = searchParams.get("startDate");
+    const end = searchParams.get("finalDate");
 
-  // Converter string para objeto Date
-  const startDateObj = start ? new Date(start) : null;
-  const endDateObj = end ? new Date(end) : null;
+    // Converter string para objeto Date
+   const [year, month, day] = start.split('-');
+const startDateObj = start ? new Date(Number(year), Number(month) - 1, Number(day)) : null;
+   const [yearEnd, monthEnd, dayEnd] = end.split('-');
+   const endDateObj = end ? new Date(Number(yearEnd), Number(monthEnd) - 1, Number(dayEnd)) : null;
 
-  if (startDateObj) setSimpleStartDate(startDateObj);
-  if (endDateObj) setSimpleFinalDate(endDateObj);
+    if (startDateObj) setSimpleStartDate(startDateObj);
+    if (endDateObj) setSimpleFinalDate(endDateObj);
 
-  if (!startDateObj || !endDateObj) return;
+    if (!startDateObj || !endDateObj) return;
 
-  const fetchData = async () => {
-    try {
-      const s = formatDate(startDateObj);
-      const e = formatDate(endDateObj);
+    const fetchData = async () => {
+      try {
+        const s = formatDate(startDateObj);
+        const e = formatDate(endDateObj);
 
-      const data = await fetchSales(s, e);
-      setSales(data);
-    } catch (err) {
-      console.error("Erro ao buscar vendas:", err);
-    }
-  };
+        const data = await fetchSales(s, e);
+        setSales(data);
+      } catch (err) {
+        console.error("Erro ao buscar vendas:", err);
+      }
+    };
 
-  fetchData();
-}, [searchParams]);
-
+    fetchData();
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,186 +57,117 @@ function SimpleSalesPage() {
     }
   };
 
-
   return (
-    <div className="min-h-screen pt-32 flex flex-col items-center gap-5 ">
-      <header>
-<nav className="dark:bg-gray-900 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700   fixed w-full top-0 start-0  dark:border-gray-600 shadow-md">
-          <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-            <span class="self-center text-2xl font-semibold whitespace-nowrap text-amber-50">
-              Sales Web MVC
-            </span>
-
-           
-            <div
-              className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
-              id="navbar-sticky"
-            >
-              <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg  md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0  dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                <li>
-                  <Link to={"/"}>
-                  <a
-                    href=""
-                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-                    aria-current="page"
-                  >
-                    Home
-                  </a>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to={"/departments"}
-                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-                  >
-                    Departmentos
-                  </Link>
-                </li>
-                 <li>
-                  <Link
-                    to={"/sellers"}
-                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-                  >
-                    Vendedores
-                  </Link>
-                </li>
-              <li>
-                    <Link to={"/sales"} className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">
-
-                  
-                    Vendas
-                  </Link>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-                  >
-                    Contato
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </nav>
-      </header>
-      <div className="w-full flex items-center mt-12 justify-between px-10">
-        
-        <h1 className="text-5xl text-center  text-white">Vendas Simples</h1>
-        <Link to="/sales">
-          <button className="text-white bg-gradient-to-r cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br rounded-lg text-2x1 px-5 py-2.5 text-center me-2 mb-2">
-            Voltar
-          </button>
-        </Link>
+    <div className="min-h-screen pt-32 bg-gradient-to-b from-slate-800 to-slate-900 text-white">
+  <header>
+<nav className="dark:bg-gray-900 bg-gradient-to-r from-blue-900 via-blue-900 to-blue-1000   fixed w-full top-0 start-0  dark:border-gray-600 shadow-md">
+      <div className="max-w-screen-xl mx-auto flex justify-between items-center p-4">
+        <span className="text-2xl font-bold text-amber-50">Sales Web MVC</span>
+        <ul className="hidden md:flex space-x-6 text-amber-50 font-medium">
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/departments">Departamentos</Link></li>
+          <li><Link to="/sellers">Vendedores</Link></li>
+          <li><Link to="/sales">Vendas</Link></li>
+          <li><a href="#">Contato</a></li>
+        </ul>
       </div>
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white  shadow-md rounded px-3 pt-3 pb-3 mb-5 max-w-md w-full"
-      >
-        <p className="text-xl font-semibold text-blue-600 mb-4">
-          Pesquisa simples
-        </p>
-        <div className="flex flex-col gap-4">
-          <label className="text-blue-800">Data Inicial</label>
+    </nav>
+  </header>
 
+  <div className="max-w-screen-xl mx-auto mt-12 px-4 flex gap-10 justify-between">
+    {/* Coluna Esquerda */}
+    <div className="w-[35%]">
+      <h1 className="text-3xl font-semibold text-white mb-6">Vendas Simples</h1>
+
+      <form onSubmit={handleSubmit} className="bg-slate-500 rounded-lg p-10 shadow-md text-gray-800">
+        <p className="text-lg font-semibold text-slate-50 mb-4">Pesquisa simples</p>
+
+          <div className=" flex mb-5 gap-5 text-center items-center">
+          <label className="text-slate-50">Data Inicial</label>
           <DatePicker
             selected={simpleStartDate}
             onChange={(date) => setSimpleStartDate(date)}
             dateFormat="dd/MM/yyyy"
             placeholderText="dd/mm/aaaa"
-            className="border border-blue-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="border bg-slate-50 border-gray-300 rounded px-3 py-2"
             showPopperArrow={false}
             isClearable
-          ></DatePicker>
-
-          <label className="text-blue-800">Data Final</label>
-
+          />
+</div>     <div className=" flex gap-7 text-center items-center ">
+          <label className="text-slate-50">Data Final</label>
           <DatePicker
             selected={simpleFinalDate}
             onChange={(date) => setSimpleFinalDate(date)}
-            placeholderText="dd/mm/aaaa"
             dateFormat="dd/MM/yyyy"
-            className="border border-blue-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholderText="dd/mm/aaaa"
+            className="border bg-slate-50 border-gray-300 rounded px-3 py-2"
             showPopperArrow={false}
             isClearable
-          ></DatePicker>
-
+          />
+</div>
           <button
             type="submit"
-            className="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+            className="mt-4 bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-800 transition"
           >
             Filtrar
           </button>
-        </div>
+        
       </form>
-      <button
-        id="buttonCreate"
-        className="text-white bg-gradient-to-r  cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br rounded-lg text-2x1 px-5 py-2.5 text-center me-2 mb-2"
-      >
-        Total de Vendas:{" "}
-        {sales
-          .reduce((sum, sale) => sum + sale.amount, 0)
-          .toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          })}
-      </button>
-      <div
-        id="tabela"
-        className="flex justify-center w-full max-h-[700px] overflow-y-auto"
-      >
-        <table className="w-3/4">
-          <thead className=" sticky top-0 bg-blue-600 z-10">
-            <th className="border text-amber-50 border-gray-300 px-4 py-2">
-              Id
-            </th>
-            <th className="border text-amber-50 border-gray-300 px-4 py-2">
-              Data
-            </th>
-            <th className="border text-amber-50 border-gray-300 px-4 py-2">
-              Vendedor
-            </th>
-            <th className="border text-amber-50 border-gray-300 px-4 py-2">
-              Departamento
-            </th>
-            <th className="border text-amber-50 border-gray-300 px-4 py-2">
-              Valor
-            </th>
-            <th className="border text-amber-50 border-gray-300 px-4 py-2">
-              Status
-            </th>
+    </div>
+
+    {/* Coluna Direita */}
+    <div className="w-[60%]">
+      <div className="mb-4">
+        <span className="text-white text-sm font-medium">
+          Total de Vendas:{" "}
+          <span className="font-bold text-green-300">
+            {sales
+              .reduce((sum, sale) => sum + sale.amount, 0)
+              .toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+          </span>
+        </span>
+      </div>
+
+      <div className="max-h-[500px] overflow-y-auto bg-white rounded-lg shadow-md">
+        <table className="w-full text-sm text-left text-gray-700">
+          <thead className="sticky top-0 bg-slate-500 text-white">
+            <tr>
+              <th className="px-4 py-2">Id</th>
+              <th className="px-4 py-2">Data</th>
+              <th className="px-4 py-2">Vendedor</th>
+              <th className="px-4 py-2">Departamento</th>
+              <th className="px-4 py-2">Valor</th>
+              <th className="px-4 py-2">Status</th>
+            </tr>
           </thead>
           <tbody>
             {sales.map((sale) => (
-              <tr key={sale.id}>
-                <td className="border text-amber-50 border-gray-300 px-4 py-2">
-                  {sale.id}
-                </td>
-                <td className="border text-amber-50 border-gray-300 px-4 py-2">
+              <tr key={sale.id} className="border-t">
+                <td className="px-4 py-2">{sale.id}</td>
+                <td className="px-4 py-2">
                   {new Date(sale.date).toLocaleDateString("pt-BR")}
                 </td>
-                <td className="border text-amber-50 border-gray-300 px-4 py-2">
-                  {sale.sellerDto.name}
-                </td>
-                <td className="border text-amber-50 border-gray-300 px-4 py-2">
-                  {sale.sellerDto.departmentName}
-                </td>
-                <td className="border text-amber-50 border-gray-300 px-4 py-2">
+                <td className="px-4 py-2">{sale.sellerDto.name}</td>
+                <td className="px-4 py-2">{sale.sellerDto.departmentName}</td>
+                <td className="px-4 py-2">
                   {sale.sellerDto.baseSalary.toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   })}
                 </td>
-                <td className="border text-amber-50 border-gray-300 px-4 py-2">
-                  {sale.status}
-                </td>
+                <td className="px-4 py-2">{sale.status}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        
       </div>
     </div>
+  </div>
+</div>
+
   );
 }
 

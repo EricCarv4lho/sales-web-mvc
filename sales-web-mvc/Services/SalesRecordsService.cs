@@ -24,7 +24,7 @@ namespace SalesWebMvc.Services
            
             if (string.IsNullOrEmpty(init) || string.IsNullOrEmpty(final))
             {
-                var sales = _context.SalesRecord
+                var sales = _context.SalesRecord.OrderByDescending(x => x.Date)
                     .Select(x => new SalesReadDto
                     {
                         Date = x.Date,
@@ -58,7 +58,7 @@ namespace SalesWebMvc.Services
             initial = DateTime.SpecifyKind(initial, DateTimeKind.Utc);
             end = DateTime.SpecifyKind(end, DateTimeKind.Utc);
 
-            var filteredSales = _context.SalesRecord
+            var filteredSales = _context.SalesRecord.OrderByDescending(x => x.Date)
                 .Where(x => x.Date >= initial && x.Date <= end)
                 .Select(x => new SalesReadDto
                 {

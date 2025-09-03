@@ -90,7 +90,7 @@ function SellersPage() {
       className="flex-col justify-center items-center space-y-10"
     >
       <header>
-<nav className="dark:bg-gray-900 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700   fixed w-full top-0 start-0  dark:border-gray-600 shadow-md">
+<nav className="dark:bg-gray-900 bg-gradient-to-r from-blue-900 via-blue-900 to-blue-1000   fixed w-full top-0 start-0  dark:border-gray-600 shadow-md">
           <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
             <span class="self-center text-2xl font-semibold whitespace-nowrap text-amber-50">
               Sales Web MVC
@@ -157,8 +157,8 @@ function SellersPage() {
         <h1 className="text-amber-50 text-5xl font-bold  mb-8">Vendedores</h1>
       </div>
 
-      <div id="tabela" className="flex justify-center flex-grow ">
-        <table className="w-3/4   border-collapse ">
+      <div id="tabela" className="flex justify-center flex-grow max-h-[500px] overflow-y-auto w-full ">
+        <table className="w-3/4  border-collapse ">
           <thead>
             <button
               id="buttonCreate"

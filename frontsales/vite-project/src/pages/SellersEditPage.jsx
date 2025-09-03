@@ -109,7 +109,7 @@ function SellersEditPage() {
   return (
     <div className="flex  flex-col justify-center items-center">
       <header>
-<nav className="dark:bg-gray-900 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700   fixed w-full top-0 start-0  dark:border-gray-600 shadow-md">
+<nav className="dark:bg-gray-900 bg-gradient-to-r from-blue-900 via-blue-900 to-blue-1000   fixed w-full top-0 start-0  dark:border-gray-600 shadow-md">
           <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
             <span class="self-center text-2xl font-semibold whitespace-nowrap text-amber-50">
               Sales Web MVC
