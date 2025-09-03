@@ -28,7 +28,7 @@ function App() {
       <Route path="/sellers/edit/:id" element={<SellersEditPage />} />
       <Route path="/sales" element={<SalesPage />} />
       <Route path="/sales/simple" element={<SimpleSalesPage />} />
-      <Route path="/sales/group" element={<GroupSalesPage />} />
+      <Route path="/sales/grouping" element={<GroupSalesPage />} />
     </Routes>
   );
 }

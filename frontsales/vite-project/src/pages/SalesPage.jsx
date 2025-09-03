@@ -3,7 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import { useNavigate } from "react-router-dom";
-import { fetchSales } from "../services/api";
+import { fetchGroupSales, fetchSales } from "../services/api";
 import { Link } from "react-router-dom";
 
 function SalesPage() {
@@ -50,18 +50,35 @@ function SalesPage() {
 
   const handleGroupSubmit = async (e) => {
     e.preventDefault();
+    const start = formatDate(simpleStartDate);
+    const final = formatDate(simpleFinalDate);
+    let initial;
+    let end;
     try {
-      const start = formatDate(simpleStartDate);
-      const final = formatDate(simpleFinalDate);
-      const data = await fetchSales(start, final);
+      // Pega o ano atual
+      const currentYear = new Date().getFullYear();
+
+      // Cria a string "YYYY-01-01"
+      const firstDayOfYear = `${currentYear}-01-01`;
+
+      // Data de hoje no formato YYYY-MM-DD
+      const today = new Date().toISOString().split("T")[0];
+
+      // Verifica os parâmetros da URL
+      initial =
+        start === undefined ? firstDayOfYear : searchParams.get("startDate");
+      end = final === undefined ? today : searchParams.get("finalDate");
+
+      const data = await fetchSales(initial, end);
       console.log(data);
     } catch (error) {
       console.error("Erro ao buscar vendas:", error);
     }
     navigate(
-      `/sales/group?startDate=${groupStartDate}&finalDate=${groupFinalDate}`
+      `/sales/grouping?startDate=${initial}&finalDate=${end}`
     );
   };
+
 
   return (
     <div className="min-h-screen  flex flex-col items-center justify-start py-10">

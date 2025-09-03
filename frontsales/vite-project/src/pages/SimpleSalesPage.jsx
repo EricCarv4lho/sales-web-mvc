@@ -153,7 +153,7 @@ const startDateObj = start ? new Date(Number(year), Number(month) - 1, Number(da
                 <td className="px-4 py-2">{sale.sellerDto.name}</td>
                 <td className="px-4 py-2">{sale.sellerDto.departmentName}</td>
                 <td className="px-4 py-2">
-                  {sale.sellerDto.baseSalary.toLocaleString("pt-BR", {
+                  {sale.amount.toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   })}

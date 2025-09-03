@@ -162,7 +162,14 @@ export async function createDepartmentApi(department) {
 
 
 export async function fetchSales(startDate,finalDate) {
-  const response = await fetch(`${API_BASE}/SalesRecords?startDate=${startDate}&finalDate=${finalDate}`);
+  const response = await fetch(`${API_BASE}/SalesRecords/simple?startDate=${startDate}&finalDate=${finalDate}`);
+  if(!response.ok) throw new Error("Error when searching sales.")
+    return response.json();
+}
+
+
+export async function fetchGroupSales(startDate,finalDate) {
+  const response = await fetch(`${API_BASE}/SalesRecords/grouping?startDate=${startDate}&finalDate=${finalDate}`);
   if(!response.ok) throw new Error("Error when searching sales.")
     return response.json();
 }

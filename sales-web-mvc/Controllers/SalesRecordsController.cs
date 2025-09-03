@@ -15,15 +15,25 @@ namespace SalesWebMvc.Controllers
             _salesRecordsService = salesRecordsService;
         }
 
-        [HttpGet]
+        [HttpGet("simple")]
         public async Task<IActionResult> SimpleSearchAsync(DateTime startDate, DateTime finalDate)
         {
             string? s = startDate.ToString("dd/MM/yyyy");
             string? f = finalDate.ToString("dd/MM/yyyy");
-            List<SalesReadDto> lista = await _salesRecordsService.FindByDateAsync(s, f);
+            List<SalesReadDto> lista = await _salesRecordsService.FindByDateSimpleAsync(s, f);
 
             return Ok(lista);
         }
-        
+
+        [HttpGet("grouping")]
+        public async Task<IActionResult> GroupingSearch(DateTime startDate, DateTime finalDate)
+        {
+            string? s = startDate.ToString("dd/MM/yyyy");
+            string? f = finalDate.ToString("dd/MM/yyyy");
+            var lista = await _salesRecordsService.FindByDateGroupAsync(s, f);
+
+            return Ok(lista);
+        }
+
     }
 }
