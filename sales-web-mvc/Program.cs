@@ -4,6 +4,7 @@ using SalesWebMvc.Data;
 using SalesWebMvc.Services;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
+using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,9 +22,14 @@ builder.Services.AddDbContext<SalesWebMvcContext>(options =>
 //builder.Services.AddScoped<SeedingService>();
 builder.Services.AddScoped<SellerService>();
 builder.Services.AddScoped<DepartmentsService>();
+builder.Services.AddScoped<SalesRecordsService>();
 
 // Controllers e Swagger
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+  .AddJsonOptions(options =>
+   {
+       options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+   });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

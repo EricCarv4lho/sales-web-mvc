@@ -161,3 +161,13 @@ export async function createDepartmentApi(department) {
 }
 
 
+export async function fetchSales(startDate,finalDate) {
+  const response = await fetch(`${API_BASE}/SalesRecords?startDate=${startDate}&finalDate=${finalDate}`);
+  if(!response.ok) throw new Error("Error when searching sales.")
+    return response.json();
+}
+
+export function formatDate(date) {
+    date.toISOString().split('T')[0];
+    return date;
+  }

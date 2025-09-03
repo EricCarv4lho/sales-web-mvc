@@ -1,16 +1,29 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SalesWebMvc.Dto;
+using SalesWebMvc.Services;
 
 namespace SalesWebMvc.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class SalesRecordsController : ControllerBase
     {
-        public IActionResult SimpleSearch()
+        private readonly SalesRecordsService _salesRecordsService;
+
+        public SalesRecordsController(SalesRecordsService salesRecordsService)
         {
-            return null;
+            _salesRecordsService = salesRecordsService;
         }
-        public IActionResult GroupingSearch()
+
+        [HttpGet]
+        public async Task<IActionResult> SimpleSearchAsync(DateTime startDate, DateTime finalDate)
         {
-            return null;
+            string? s = startDate.ToString("dd/MM/yyyy");
+            string? f = finalDate.ToString("dd/MM/yyyy");
+            List<SalesReadDto> lista = await _salesRecordsService.FindByDateAsync(s, f);
+
+            return Ok(lista);
         }
+        
     }
 }

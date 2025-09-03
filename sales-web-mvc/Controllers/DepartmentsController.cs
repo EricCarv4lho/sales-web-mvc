@@ -10,7 +10,7 @@ using System.Net;
 namespace SalesWebMvc.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]")] 
     public class DepartmentsController : ControllerBase
     {
         private readonly DepartmentsService _service;
