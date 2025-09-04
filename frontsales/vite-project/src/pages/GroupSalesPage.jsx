@@ -136,6 +136,9 @@ function GroupSalesPage() {
             </button>
           </form>
         </div>
+         
+         
+     
 
         <div className="max-h-[500px] overflow-y-auto bg-white rounded-lg shadow-md">
           <table className="w-full text-sm text-left text-gray-700">
@@ -154,7 +157,7 @@ function GroupSalesPage() {
                 <React.Fragment key={group.departmentName}>
                   <tr className="bg-gray-200">
                     <td colSpan={6} className="px-4 py-2 font-bold text-black">
-                      Departamento: {group.departmentName}
+                      <p>Departamento: {group.departmentName}</p> <p>Total: {group.sales.reduce((sum, sale) => sum + sale.amount, 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p> 
                     </td>
                   </tr>
                   {group.sales.map((sale) => (
