@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Humanizer;
+using Microsoft.EntityFrameworkCore;
 using SalesWebMvc.Data;
 using SalesWebMvc.Dto;
 using SalesWebMvc.Migrations;
 using SalesWebMvc.Models;
+using SalesWebMvc.Models.Enums;
 using SalesWebMvc.Services.Exceptions;
 using System.Globalization;
 
@@ -18,47 +20,78 @@ namespace SalesWebMvc.Services
             _context = context;
         }
 
-
-        public async Task<List<SalesReadDto>> FindByDateSimpleAsync(string? init, string? final)
+        public async Task<SalesReadDto> RegisterSale(SalesCreateDto saleCreateDto)
         {
 
-            if (string.IsNullOrEmpty(init) || string.IsNullOrEmpty(final))
+            if (saleCreateDto.Amount < 0)
             {
-                var sales = _context.SalesRecord.OrderByDescending(x => x.Date)
-                    .Select(x => new SalesReadDto
-                    {
-                        Date = x.Date,
-                        Amount = x.Amount,
-                        Status = x.SaleStatus,
-                        Id = x.Id,
-                        SellerDto = new SellerReadDto
-                        {
-                            BaseSalary = x.Seller.BaseSalary,
-                            Name = x.Seller.Name,
-                            BirthDate = x.Seller.BirthDate,
-                            Email = x.Seller.Email,
-                            DepartmentId = x.Seller.Department.Id,
-                            DepartmentName = x.Seller.Department.Name,
-                            Id = x.Seller.Id
-                        }
-                    });
+                throw new BusinessException("BaseSalary cannot be less than 0");
 
-                return await sales.ToListAsync();
             }
 
-            // Se init e final forem passados, tenta converter
-            bool dateInitValid = DateTime.TryParseExact(init, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime initial);
-            if (!dateInitValid)
-                throw new BusinessException("Initial Date is not valid.");
+            SaleStatus status;
+            if (saleCreateDto.Status == 0)
+                status = SaleStatus.Pendente;
+            else if (saleCreateDto.Status == 1)
+                status = SaleStatus.Faturado;
+            else if (saleCreateDto.Status == 2)
+                status = SaleStatus.Cancelado;
+            else
+                throw new ArgumentException("Status inválido");
 
-            bool dateFinalValid = DateTime.TryParseExact(final, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime end);
-            if (!dateFinalValid)
-                throw new BusinessException("Final date is not valid.");
 
-            initial = DateTime.SpecifyKind(initial, DateTimeKind.Utc);
-            end = DateTime.SpecifyKind(end, DateTimeKind.Utc);
 
-            var filteredSales = _context.SalesRecord.OrderByDescending(x => x.Date)
+            bool isDateValid = DateTime.TryParseExact(saleCreateDto.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateSale);
+            if (!isDateValid)
+                throw new BusinessException("Date is not valid.");
+
+
+            dateSale = DateTime.SpecifyKind(dateSale, DateTimeKind.Utc);
+
+            Seller? seller = await _context.Seller.FirstOrDefaultAsync(x => x.Id == saleCreateDto.SellerId);
+
+            if (seller != null)
+            {
+
+                SalesRecord sale = new(dateSale, saleCreateDto.Amount, status, seller);
+
+                Console.WriteLine(sale.Id);
+
+                _context.SalesRecord.Add(sale);
+                await _context.SaveChangesAsync();
+
+                SalesReadDto saleRead = new SalesReadDto
+                {
+                    Id = sale.Id,
+                    Amount = sale.Amount,
+                    Date = sale.Date,
+                    SellerName = sale.Seller.Name,
+                    Status = sale.SaleStatus
+                };
+                return saleRead;
+            }
+            else
+            {
+                throw new NotFoundException("Seller Not Found.");
+            }
+
+
+
+        }
+
+        public async Task<List<SalesReadDto>> FindByDateSimpleAsync(DateTime startDate, DateTime finalDate)
+        {
+            // Defina o fuso horário de Brasília (-03)
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+
+            // Converta corretamente do horário local para UTC
+            var initial = TimeZoneInfo.ConvertTimeToUtc(startDate.Date, timeZone);
+            var end = TimeZoneInfo.ConvertTimeToUtc(finalDate.Date.AddDays(1).AddTicks(-1), timeZone);
+
+           
+
+            var filteredSales = _context.SalesRecord
+                .OrderByDescending(x => x.Date)
                 .Where(x => x.Date >= initial && x.Date <= end)
                 .Select(x => new SalesReadDto
                 {
@@ -66,6 +99,7 @@ namespace SalesWebMvc.Services
                     Amount = x.Amount,
                     Status = x.SaleStatus,
                     Id = x.Id,
+                    SellerName = x.Seller.Name,
                     SellerDto = new SellerReadDto
                     {
                         BaseSalary = x.Seller.BaseSalary,
@@ -81,63 +115,19 @@ namespace SalesWebMvc.Services
             return await filteredSales.ToListAsync();
         }
 
-        public async  Task<List<GroupedSalesDto>> FindByDateGroupAsync(string? init, string? final)
+        public async Task<List<GroupedSalesDto>> FindByDateGroupAsync(DateTime startDate, DateTime finalDate)
         {
 
+            // Defina o fuso horário de Brasília (-03)
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
 
-            if (string.IsNullOrEmpty(init) || string.IsNullOrEmpty(final))
-            {
+            // Converta corretamente do horário local para UTC
+            var initial = TimeZoneInfo.ConvertTimeToUtc(startDate.Date, timeZone);
+            var end = TimeZoneInfo.ConvertTimeToUtc(finalDate.Date.AddDays(1).AddTicks(-1), timeZone);
 
 
-                // Busca os dados do banco primeiro
-                var sales = await _context.SalesRecord
-
-        .Select(x => new SalesReadDto
-        {
-            Date = x.Date,
-            Amount = x.Amount,
-            Status = x.SaleStatus,
-            Id = x.Id,
-            SellerDto = new SellerReadDto
-            {
-                BaseSalary = x.Seller.BaseSalary,
-                Name = x.Seller.Name,
-                BirthDate = x.Seller.BirthDate,
-                Email = x.Seller.Email,
-                DepartmentId = x.Seller.Department.Id,
-                DepartmentName = x.Seller.Department.Name,
-                Id = x.Seller.Id
-            }
-        })
-        .ToListAsync(); // Executa no banco
-
-                // Agora agrupa em memória (por departamento)
-                
-                var grouped = sales
-                            .GroupBy(x => x.SellerDto.DepartmentName)
-                            .Select(g => new GroupedSalesDto
-                            {
-                                DepartmentName = g.Key,
-                                Sales = g.ToList()
-                            })
-                            .ToList();
-
-                return grouped;
-            
-        }
-            else
-            {
-                // Se init e final forem passados, tenta converter
-                bool dateInitValid = DateTime.TryParseExact(init, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime initial);
-                if (!dateInitValid)
-                    throw new BusinessException("Initial Date is not valid.");
-
-                bool dateFinalValid = DateTime.TryParseExact(final, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime end);
-                if (!dateFinalValid)
-                    throw new BusinessException("Final date is not valid.");
-
-                initial = DateTime.SpecifyKind(initial, DateTimeKind.Utc);
-                end = DateTime.SpecifyKind(end, DateTimeKind.Utc);
+       
+           
 
                 var sales = await _context.SalesRecord
         .Where(x => x.Date >= initial && x.Date <= end)
@@ -147,6 +137,7 @@ namespace SalesWebMvc.Services
             Amount = x.Amount,
             Status = x.SaleStatus,
             Id = x.Id,
+            SellerName = x.Seller.Name,
             SellerDto = new SellerReadDto
             {
                 BaseSalary = x.Seller.BaseSalary,
@@ -173,6 +164,52 @@ namespace SalesWebMvc.Services
             }
 
 
+
+
+        
+
+
+        public async Task<SalesReadDto> GetSaleById(int id)
+        {
+
+
+            SalesReadDto? sale = await _context.SalesRecord.Where(x => x.Id == id).Select(s => new SalesReadDto
+            {
+                Amount = s.Amount,
+                Status = s.SaleStatus,
+                Date = s.Date,
+                SellerName = s.Seller.Name
+            }).FirstOrDefaultAsync();
+
+
+            if (sale == null)
+            {
+                throw new NotFoundException("Seller not found.");
+            }
+            else
+            {
+                return sale;
+            }
+
+        }
+
+         
+        public async Task<List<SalesReadDto>> FindAllAsync()
+        {
+
+
+            List<SalesReadDto> sales = await _context.SalesRecord.Select(s => new SalesReadDto
+            {
+                Id = s.Id,
+                Amount = s.Amount,
+                Status = s.SaleStatus,
+                Date = s.Date,
+                SellerName = s.Seller.Name
+            }).ToListAsync();
+
+
+
+            return sales;
 
 
         }

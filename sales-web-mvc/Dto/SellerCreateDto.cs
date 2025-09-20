@@ -9,7 +9,6 @@ namespace SalesWebMvc.Dto
        
         public string Name { get; set; } = "";
 
-
         public string Email { get; set; } = "";
 
         public double BaseSalary { get; set; } = 0;
@@ -17,5 +16,10 @@ namespace SalesWebMvc.Dto
 
         public int DepartmentId { get; set; }
 
+
+       
+
     }
+
+
 }

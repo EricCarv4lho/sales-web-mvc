@@ -1,241 +1,219 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchGroupSales, fetchSales, fetchSimpleSales } from "../services/api";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-import { useNavigate } from "react-router-dom";
-import { fetchGroupSales, fetchSales } from "../services/api";
-import { Link } from "react-router-dom";
+import React from "react";
 
 function SalesPage() {
-  const [simpleStartDate, setSimpleStartDate] = useState(null);
-  const [simpleFinalDate, setSimpleFinalDate] = useState(null);
-  const [groupStartDate, setGroupStartDate] = useState(null);
-  const [groupFinalDate, setGroupFinalDate] = useState(null);
-  const navigate = useNavigate();
+  const [sales, setSales] = useState([]);
+  const [salesSimple, setSalesSimple] = useState([]);
+  const [salesGroup, setSalesGroup] = useState([]);
+  const [dateInitSimple, setDateInitSimple] = useState(null);
+  const [dateFinalSimple, setDateFinalSimple] = useState(null);
+  const [dateInitGroup, setDateInitGroup] = useState(null);
+  const [dateFinalGroup, setDateFinalGroup] = useState(null);
+  const [displaySales, setDisplaySales] = useState([]);
+  const [groupSales, setGroupSales] = useState(false); // <-- novo estado
 
   function formatDate(date) {
-    return date?.toISOString().split("T")[0]; // yyyy-MM-dd
+    console.log(date);
+    return new Date(date).toISOString().split("T")[0];
+    // retorna "2025-09-15"
   }
+
+  useEffect(() => {
+    fetchSales().then((data) => {
+      setSales(data);
+      setDisplaySales(data);
+    });
+  }, []);
 
   const handleSimpleSubmit = async (e) => {
     e.preventDefault();
+    setSalesSimple(true)
+    setGroupSales(false);
+    const initial = dateInitSimple ? formatDate(dateInitSimple) : "";
+    const end = dateFinalSimple ? formatDate(dateFinalSimple) : "";
 
-    const start = formatDate(simpleStartDate);
-    const final = formatDate(simpleFinalDate);
-    let initial;
-    let end;
+    console.log(initial);
     try {
-      // Pega o ano atual
-      const currentYear = new Date().getFullYear();
+      const result = await fetchSimpleSales(initial, end);
 
-      // Cria a string "YYYY-01-01"
-      const firstDayOfYear = `${currentYear}-01-01`;
-
-      // Data de hoje no formato YYYY-MM-DD
-      const today = new Date().toISOString().split("T")[0];
-
-      // Verifica os parâmetros da URL
-      initial =
-        start === undefined ? firstDayOfYear : searchParams.get("startDate");
-      end = final === undefined ? today : searchParams.get("finalDate");
-
-      const data = await fetchSales(initial, end);
-      console.log(data);
-    } catch (error) {
-      console.error("Erro ao buscar vendas:", error);
+      setDisplaySales(result);
+    } catch (err) {
+      console.log(err.message || "Erro ao buscar vendas.");
     }
 
-    navigate(`/sales/simple?startDate=${initial}&finalDate=${end}`);
+    console.log(new Date(dateInitSimple).toLocaleDateString("pt-BR"));
   };
 
   const handleGroupSubmit = async (e) => {
     e.preventDefault();
-    const start = formatDate(simpleStartDate);
-    const final = formatDate(simpleFinalDate);
-    let initial;
-    let end;
+    setGroupSales(true);
+    setSalesSimple(false);
+    const initial = dateInitGroup ? formatDate(dateInitGroup) : "";
+    const end = dateFinalGroup ? formatDate(dateFinalGroup) : "";
+
+    console.log(initial);
     try {
-      // Pega o ano atual
-      const currentYear = new Date().getFullYear();
-
-      // Cria a string "YYYY-01-01"
-      const firstDayOfYear = `${currentYear}-01-01`;
-
-      // Data de hoje no formato YYYY-MM-DD
-      const today = new Date().toISOString().split("T")[0];
-
-      // Verifica os parâmetros da URL
-      initial =
-        start === undefined ? firstDayOfYear : searchParams.get("startDate");
-      end = final === undefined ? today : searchParams.get("finalDate");
-
-      const data = await fetchSales(initial, end);
-      console.log(data);
-    } catch (error) {
-      console.error("Erro ao buscar vendas:", error);
+      const result = await fetchGroupSales(initial, end);
+      setSalesGroup(result);
+      console.log(result);
+    } catch (err) {
+      console.log(err.message || "Erro ao buscar vendas.");
     }
-    navigate(
-      `/sales/grouping?startDate=${initial}&finalDate=${end}`
-    );
+
+    console.log(new Date(dateInitGroup).toLocaleDateString("pt-BR"));
   };
 
-
   return (
-    <div className="min-h-screen  flex flex-col items-center justify-start py-10">
-      <header>
-        <nav className="dark:bg-gray-900 bg-gradient-to-r from-blue-900 via-blue-900 to-blue-1000   fixed w-full top-0 start-0  dark:border-gray-600 shadow-md">
-          <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-            <span class="self-center text-2xl font-semibold whitespace-nowrap text-amber-50">
-              Sales Web MVC
-            </span>
+    <div className="min-h-screen bg-gray-900 p-6 flex flex-col items-center text-center text-white gap-10">
+      <h1 className="text-5xl font-bold">Página de Vendas</h1>
 
-            <div
-              className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
-              id="navbar-sticky"
-            >
-              <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg  md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0  dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                <li>
-                  <Link to={"/"}>
-                    <a
-                      href=""
-                      className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-                      aria-current="page"
-                    >
-                      Home
-                    </a>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to={"/departments"}
-                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-                  >
-                    Departmentos
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to={"/sellers"}
-                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-                  >
-                    Vendedores
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to={"/sales"}
-                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-                  >
-                    Vendas
-                  </Link>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="block py-2 px-3 text-amber-50 rounded-sm hover:bg-gray-100 md:hover:bg-transparent  dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-                  >
-                    Contato
-                  </a>
-                </li>
-              </ul>
-            </div>
+      {/* Filtros */}
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Vendas Simples */}
+        <form className="bg-slate-700 rounded-lg p-2 shadow-md space-y-2 ">
+          <p className="text-lg font-semibold">Vendas Simples</p>
+          <div className="flex  gap-2">
+            <DatePicker
+              selected={dateInitSimple}
+              onChange={(date) => setDateInitSimple(date)}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="Data Inicial"
+              className="border bg-slate-50 text-black border-gray-300 rounded px-3 py-2"
+              showPopperArrow={false}
+              isClearable
+            />
+            <DatePicker
+              selected={dateFinalSimple}
+              onChange={(date) => setDateFinalSimple(date)}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="Data Final"
+              className="border bg-slate-50 text-black border-gray-300 rounded px-3 py-2"
+              showPopperArrow={false}
+              isClearable
+            />
           </div>
-        </nav>
-      </header>
-
-      <div className="w-full flex items-center mt-12 justify-between px-10">
-        <h1 className="text-5xl text-center p-5  text-white">
-          Registros de Vendas
-        </h1>
-        <Link to="/">
-          <button className="text-white bg-gradient-to-r cursor-pointer from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br rounded-lg text-2x1 px-5 py-2.5 text-center me-2 mb-2">
-            Voltar
+          <button
+            onClick={handleSimpleSubmit}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mt-2"
+          >
+            Filtrar
           </button>
-        </Link>
+        </form>
+
+        {/* Vendas Agrupadas */}
+        <form className="bg-slate-700 rounded-lg p-2 shadow-md space-y-2">
+          <p className="text-lg font-semibold">Vendas Agrupadas</p>
+          <div className="flex  gap-2">
+            <DatePicker
+              selected={dateInitGroup}
+              onChange={(date) => setDateInitGroup(date)}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="Data Inicial"
+              className="border bg-slate-50 text-black border-gray-300 rounded px-3 py-2 "
+              showPopperArrow={false}
+              isClearable
+            />
+            <DatePicker
+              selected={dateFinalGroup}
+              onChange={(date) => setDateFinalGroup(date)}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="Data Final"
+              className="border bg-slate-50 text-black border-gray-300 rounded px-3 py-2"
+              showPopperArrow={false}
+              isClearable
+            />
+          </div>
+          <button
+            onClick={handleGroupSubmit}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mt-2"
+          >
+            Filtrar
+          </button>
+        </form>
       </div>
 
-      {/* Pesquisa simples */}
-      <div className="flex justify-center gap-10">
-      <form
-        onSubmit={handleSimpleSubmit}
-        className="bg-slate-500 shadow-md rounded px-6 pt-6 pb-8  max-w-md w-full"
-      >
-        <p className="text-xl font-semibold text-slate-50 mb-4">
-          Pesquisa simples
-        </p>
-        <div className="flex flex-col gap-4">
-          <label className="text-slate-50">Data Inicial</label>
+      {/* Tabela com Scroll */}
+      <div className="w-full max-w-6xl overflow-x-auto max-h-[500px] overflow-y-auto border border-gray-700 rounded-lg">
+        <table className="min-w-full text-sm text-left border-collapse">
+          <thead className="sticky top-0 bg-blue-800 text-white ">
+            <tr>
+              <th className="px-4 py-3 border border-gray-600">DATA</th>
+              <th className="px-4 py-3 border border-gray-600">VALOR</th>
+              <th className="px-4 py-3 border border-gray-600">STATUS</th>
+              <th className="px-4 py-3 border border-gray-600">VENDEDOR</th>
+              
+            </tr>
+          </thead>
 
-          <DatePicker
-            selected={simpleStartDate}
-            onChange={(date) => setSimpleStartDate(date)}
-            dateFormat="dd/MM/yyyy"
-            placeholderText="dd/mm/aaaa"
-            className="border bg-slate-50 border-blue-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-            showPopperArrow={false}
-            isClearable
-          ></DatePicker>
+          {salesSimple && (
+            <tbody>
+              {displaySales.map((sale) => (
+                <tr key={sale.id} className="hover:bg-slate-800 transition">
+                  <td className="px-4 py-2 border border-gray-700">
+                    {new Date(sale.date).toLocaleDateString("pt-BR")}
+                  </td>
+                  <td className="px-4 py-2 border border-gray-700">
+                    {sale.amount}
+                  </td>
+                  <td className="px-4 py-2 border border-gray-700">
+                    {sale.status}
+                  </td>
+                  <td className="px-4 py-2 border border-gray-700">
+                    {sale.sellerName}
+                  </td>
+                  
+                </tr>
+              ))}
+            </tbody>
+          )}
 
-          <label className="text-slate-50">Data Final</label>
-
-          <DatePicker
-            selected={simpleFinalDate}
-            onChange={(date) => setSimpleFinalDate(date)}
-            placeholderText="dd/mm/aaaa"
-            dateFormat="dd/MM/yyyy"
-            className="border bg-slate-50 border-blue-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-            showPopperArrow={false}
-            isClearable
-          ></DatePicker>
-          <button
-            type="submit"
-            className="mt-4 bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-800 transition"
-          >
-            Pesquisar
-          </button>
-        </div>
-      </form>
-
-      {/* Pesquisa agrupada */}
-      <form
-        onSubmit={handleGroupSubmit}
-        className="bg-slate-500 shadow-md rounded px-6 pt-6 pb-8 max-w-md w-full"
-      >
-        <p className="text-xl font-semibold text-slate-50 mb-4">
-          Pesquisa agrupada
-        </p>
-        <div className="flex flex-col gap-4">
-          <label className="text-slate-50">Data Inicial</label>
-          <DatePicker
-            selected={groupStartDate}
-            onChange={(date) => setGroupStartDate(date)}
-            placeholderText="dd/mm/yyyy"
-            dateFormat="dd/MM/yyyy"
-            className="border bg-slate-50 border-blue-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-            showPopperArrow={false}
-            isClearable
-          ></DatePicker>
-          <label className="text-slate-50">Data Final</label>
-
-          <DatePicker
-            selected={groupFinalDate}
-            onChange={(date) => setGroupFinalDate(date)}
-            placeholderText="dd/mm/yyyy"
-            dateFormat="dd/MM/yyyy"
-            showPopperArrow={false}
-            isClearable
-            className="border bg-slate-50 border-blue-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-          ></DatePicker>
-
-          <button
-            type="submit"
-            className="mt-4 bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-800 transition"
-          >
-            Pesquisar
-          </button>
-        </div>
-      </form>
+          {/* Tabela Agrupada */}
+          {groupSales && (
+            <tbody>
+              {salesGroup.map((group) => (
+                <React.Fragment key={group.departmentName}>
+                  {/* Linha de título do departamento */}
+                  <tr className="bg-blue-900 text-white font-bold">
+                    <td colSpan={6} className="px-4 py-2">
+                      Departamento: {group.departmentName}
+                    </td>
+                  </tr>
+                  {/* Vendas do departamento */}
+                  {group.sales.map((s) => (
+                    <tr key={s.id}>
+                      
+                      <td className="px-4 py-2">
+                        {new Date(s.date).toLocaleDateString("pt-BR")}
+                      </td>
+                      <td className="px-4 py-2">
+                        {s.amount.toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
+                      </td>
+                      <td className="px-4 py-2">{s.status}</td>
+                      
+                      <td className="px-4 py-2">{s.sellerName}</td>
+                    </tr>
+                  ))}
+                </React.Fragment>
+              ))}
+            </tbody>
+          )}
+        </table>
       </div>
+
+      {/* Botão Criar */}
+      <button
+        id="buttonCreate"
+        onClick={() => alert("Abrir modal de criação")}
+        className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 mt-4"
+      >
+        CRIAR
+      </button>
     </div>
   );
 }

@@ -41,7 +41,8 @@ namespace SalesWebMvc.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+
                     Amount = table.Column<double>(type: "double precision", nullable: false),
                     SaleStatus = table.Column<int>(type: "integer", nullable: false),
                     SellerId = table.Column<int>(type: "integer", nullable: false)

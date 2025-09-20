@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { deleteSellers, fetchSellers } from "../services/api";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { createSellerApi } from "../services/api";
 
@@ -14,7 +14,7 @@ function SellersPage() {
   const [createSeller, setCreateSeller] = useState(false);
 
   const [departments, setDepartments] = useState([]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     fetchSellers()
       .then((data) => setSellers(data))
@@ -35,6 +35,7 @@ function SellersPage() {
   const [baseSalary, setBaseSalary] = useState("");
   const [sellerId, setSellerId] = useState(0);
   const [departmentId, setDepartmentId] = useState(0);
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
      

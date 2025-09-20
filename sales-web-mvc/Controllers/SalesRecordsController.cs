@@ -18,9 +18,8 @@ namespace SalesWebMvc.Controllers
         [HttpGet("simple")]
         public async Task<IActionResult> SimpleSearchAsync(DateTime startDate, DateTime finalDate)
         {
-            string? s = startDate.ToString("dd/MM/yyyy");
-            string? f = finalDate.ToString("dd/MM/yyyy");
-            List<SalesReadDto> lista = await _salesRecordsService.FindByDateSimpleAsync(s, f);
+           
+            List<SalesReadDto> lista = await _salesRecordsService.FindByDateSimpleAsync(startDate, finalDate);
 
             return Ok(lista);
         }
@@ -28,9 +27,18 @@ namespace SalesWebMvc.Controllers
         [HttpGet("grouping")]
         public async Task<IActionResult> GroupingSearch(DateTime startDate, DateTime finalDate)
         {
-            string? s = startDate.ToString("dd/MM/yyyy");
-            string? f = finalDate.ToString("dd/MM/yyyy");
-            var lista = await _salesRecordsService.FindByDateGroupAsync(s, f);
+          
+            var lista = await _salesRecordsService.FindByDateGroupAsync(startDate, finalDate);
+
+            return Ok(lista);
+        }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> FindAll ()
+        {
+            
+            
+            var lista = await _salesRecordsService.FindAllAsync();
 
             return Ok(lista);
         }

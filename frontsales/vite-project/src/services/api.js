@@ -160,9 +160,15 @@ export async function createDepartmentApi(department) {
   return data;
 }
 
-
-export async function fetchSales(startDate,finalDate) {
+export async function fetchSimpleSales(startDate,finalDate) {
   const response = await fetch(`${API_BASE}/SalesRecords/simple?startDate=${startDate}&finalDate=${finalDate}`);
+  console.log(response);
+  if(!response.ok) throw new Error("Error when searching sales.")
+    return response.json();
+}
+
+export async function fetchSales() {
+  const response = await fetch(`${API_BASE}/SalesRecords/all`);
   if(!response.ok) throw new Error("Error when searching sales.")
     return response.json();
 }
@@ -170,6 +176,7 @@ export async function fetchSales(startDate,finalDate) {
 
 export async function fetchGroupSales(startDate,finalDate) {
   const response = await fetch(`${API_BASE}/SalesRecords/grouping?startDate=${startDate}&finalDate=${finalDate}`);
+  console.log(response);
   if(!response.ok) throw new Error("Error when searching sales.")
     return response.json();
 }
@@ -178,3 +185,28 @@ export function formatDate(date) {
     date.toISOString().split('T')[0];
     return date;
   }
+
+
+  export async function registerSaleApi(sale){
+    const response = await fetch(`${API_BASE}/SalesRecords`, {
+      method: 'POST',
+      headers: {
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify(sale)
+    })
+
+    if (!response.ok) {
+    const errorText = await response.text();
+    alert(errorText); // aqui mostra o erro do backend
+    return null;
+  }
+
+
+
+  const data = await response.json();
+  return data;
+}
+
+    
+  
