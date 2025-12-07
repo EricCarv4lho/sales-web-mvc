@@ -1,13 +1,14 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using SalesWebMvc.Data;
 using SalesWebMvc.Services;
-using Microsoft.AspNetCore.Localization;
 using System.Globalization;
-using System.Text.Json.Serialization;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,6 +44,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
+
+
 // Injeção de dependências
 //builder.Services.AddScoped<SeedingService>();
 builder.Services.AddScoped<SellerService>();
@@ -58,7 +62,36 @@ builder.Services.AddControllers()
        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
    });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        BearerFormat = "JWT",
+        Name = "Authorization",
+        Description = "Insira o token JWT no campo abaixo. Exemplo: Bearer {seu token}",
+        Scheme = "bearer",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http
+
+    }
+);
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
 
 // CORS para permitir requisições do React
 builder.Services.AddCors(options =>
