@@ -1,16 +1,13 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using SalesWebMvc.Dto;
-using SalesWebMvc.Models;
 using SalesWebMvc.Services;
 using SalesWebMvc.Services.Exceptions;
-using System.Globalization;
 namespace SalesWebMvc.Controllers
-{
+{ 
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "USER")]
     public class SellersController : ControllerBase
     {
         private readonly SellerService _sellerService;
@@ -21,25 +18,52 @@ namespace SalesWebMvc.Controllers
             
         }
 
-        [HttpGet]
-       
+        [HttpGet]     
         public async Task<IActionResult> GetSellers()
         {
-            List<SellerReadDto> list = await _sellerService.FindAllAsync();
-            return Ok(list);
+            try
+            {
+                List<SellerReadDto> list = await _sellerService.FindAllAsync();
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
+           
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSellerById(int id)
-        {
-            SellerReadDto seller = await _sellerService.FindByIdDtoAsync(id);
-            return Ok(seller);
+        {  
+            if(id <= 0)
+            {
+                return BadRequest("Invalid seller ID.");
+            }
+
+            try
+            {
+                SellerReadDto seller = await _sellerService.FindByIdDtoAsync(id);
+                return Ok(seller);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
+
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateSeller([FromBody] SellerCreateDto dto)
         {
 
+            
             try
             {
                 SellerReadDto seller = await _sellerService.CreateSellerAsync(dto);
@@ -49,21 +73,25 @@ namespace SalesWebMvc.Controllers
             {
                 return BadRequest(ex.Message);
             }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
         }
         
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSeller(int id, SellerCreateDto dto)
         {
-         
-         
+            if (id <= 0)
+            {
+                return BadRequest("Invalid seller ID.");
+            }
 
             try   
-            {
-                
+            { 
                 await _sellerService.UpdateSellerAsync(id ,dto);
                 return NoContent();
-
             }
             catch(NotFoundException ex)
             {
@@ -82,20 +110,19 @@ namespace SalesWebMvc.Controllers
 
             }
 
-
-
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSeller(int? id)
+        public async Task<IActionResult> DeleteSeller(int id)
         {
-            if (id == null)
+            if(id <= 0)
             {
-                return NotFound();
+                return BadRequest("Invalid seller ID.");
             }
+
             try
             {
-                await _sellerService.RemoveSellerAsync(id.Value);
+                await _sellerService.RemoveSellerAsync(id);
                 return Ok();
             }
 

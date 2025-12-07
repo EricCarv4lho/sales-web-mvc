@@ -6,13 +6,13 @@ namespace SalesWebMvc.Dto
     public class SellerCreateDto
     {
 
-       
-        public string Name { get; set; } = "";
 
-        public string Email { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
+
+        public string Email { get; set; } = string.Empty;
 
         public double BaseSalary { get; set; } = 0;
-        public string BirthDate { get; set; } = "";
+        public string BirthDate { get; set; } = string.Empty;
 
         public int DepartmentId { get; set; }
 

@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿
 using Microsoft.EntityFrameworkCore;
-using NuGet.Versioning;
+
 using SalesWebMvc.Data;
 using SalesWebMvc.Dto;
 using SalesWebMvc.Models;
@@ -35,7 +34,7 @@ namespace SalesWebMvc.Services
             return sellers;
         }
 
-        public async Task<SellerReadDto> FindByIdDtoAsync (int? id)
+        public async Task<SellerReadDto> FindByIdDtoAsync (int id)
         {
 
             SellerReadDto? sellerRead = await _context.Seller.Where(s => s.Id == id).Select(seller => new SellerReadDto
@@ -89,14 +88,18 @@ namespace SalesWebMvc.Services
             }
 
 
-
-
            await _context.SaveChangesAsync();
 
         }
 
         public async Task<SellerReadDto> CreateSellerAsync(SellerCreateDto dto)
         {
+
+            if(dto == null || string.IsNullOrEmpty(dto.Name))
+            {
+                throw new BusinessException("Seller data not provided.");
+            }
+
             Department? department = await _context.Department.FirstOrDefaultAsync(d => d.Id == dto.DepartmentId);
             bool emailExists = await _context.Seller.AnyAsync(s => s.Email == dto.Email);
 
@@ -149,22 +152,26 @@ namespace SalesWebMvc.Services
 
 
         public async Task UpdateSellerAsync(int id, SellerCreateDto dto)
-        {
+        {   
+          
 
-           Seller seller =  await _context.Seller.FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException("Id not found.");
+            if(dto == null)
+            {
+                throw new BusinessException("Seller data not provided.");
+            }
 
+            Seller seller =  await _context.Seller.FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException("Id not found.");
+
+            
             bool emailExists = await _context.Seller.AnyAsync(s => s.Email == dto.Email && s.Id != id);
             if (emailExists)
             {
                 throw new BusinessException("Emails already exists.");
-
             }
             
-
             if (dto.BaseSalary < 0)
             {
                 throw new BusinessException("BaseSalary cannot be less than 0");
-
             }
 
             seller.Name = dto.Name;
