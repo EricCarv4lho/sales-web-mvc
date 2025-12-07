@@ -5,6 +5,9 @@ using SalesWebMvc.Services;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using System.Text.Json.Serialization;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Security.Claims;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,11 +21,35 @@ builder.Services.AddDbContext<SalesWebMvcContext>(options =>
     )
 );
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty)),
+        ClockSkew = TimeSpan.Zero
+       
+
+
+    };
+});
+
 // Injeção de dependências
 //builder.Services.AddScoped<SeedingService>();
 builder.Services.AddScoped<SellerService>();
 builder.Services.AddScoped<DepartmentsService>();
 builder.Services.AddScoped<SalesRecordsService>();
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<AuthService>();
 
 // Controllers e Swagger
 builder.Services.AddControllers()
@@ -52,7 +79,7 @@ var localizationOptions = new RequestLocalizationOptions
     SupportedUICultures = new List<CultureInfo> { ptBR },
 };
 
-
+builder.Services.AddAuthorization();
     
 var app = builder.Build();
 app.UseRequestLocalization(localizationOptions);
@@ -82,6 +109,8 @@ app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 
 app.UseRouting();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Mapear Controllers
