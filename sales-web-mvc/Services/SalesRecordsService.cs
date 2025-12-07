@@ -1,8 +1,6 @@
-﻿using Humanizer;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SalesWebMvc.Data;
 using SalesWebMvc.Dto;
-using SalesWebMvc.Migrations;
 using SalesWebMvc.Models;
 using SalesWebMvc.Models.Enums;
 using SalesWebMvc.Services.Exceptions;
@@ -23,6 +21,8 @@ namespace SalesWebMvc.Services
         public async Task<SalesReadDto> RegisterSale(SalesCreateDto saleCreateDto)
         {
 
+
+
             if (saleCreateDto.Amount < 0)
             {
                 throw new BusinessException("BaseSalary cannot be less than 0");
@@ -37,7 +37,7 @@ namespace SalesWebMvc.Services
             else if (saleCreateDto.Status == 2)
                 status = SaleStatus.Cancelado;
             else
-                throw new ArgumentException("Status inválido");
+                throw new ArgumentException("Status is not valid.");
 
 
 
@@ -48,19 +48,16 @@ namespace SalesWebMvc.Services
 
             dateSale = DateTime.SpecifyKind(dateSale, DateTimeKind.Utc);
 
-            Seller? seller = await _context.Seller.FirstOrDefaultAsync(x => x.Id == saleCreateDto.SellerId);
+            Seller? seller = await _context.Seller.FirstOrDefaultAsync(x => x.Id == saleCreateDto.SellerId) ?? throw new NotFoundException("Seller not found.");
+            
+            SalesRecord sale = new(dateSale, saleCreateDto.Amount, status, seller);
 
-            if (seller != null)
-            {
-
-                SalesRecord sale = new(dateSale, saleCreateDto.Amount, status, seller);
-
-                Console.WriteLine(sale.Id);
+                
 
                 _context.SalesRecord.Add(sale);
                 await _context.SaveChangesAsync();
 
-                SalesReadDto saleRead = new SalesReadDto
+                SalesReadDto saleRead = new()
                 {
                     Id = sale.Id,
                     Amount = sale.Amount,
@@ -69,11 +66,8 @@ namespace SalesWebMvc.Services
                     Status = sale.SaleStatus
                 };
                 return saleRead;
-            }
-            else
-            {
-                throw new NotFoundException("Seller Not Found.");
-            }
+            
+            
 
 
 
@@ -88,7 +82,7 @@ namespace SalesWebMvc.Services
             var initial = TimeZoneInfo.ConvertTimeToUtc(startDate.Date, timeZone);
             var end = TimeZoneInfo.ConvertTimeToUtc(finalDate.Date.AddDays(1).AddTicks(-1), timeZone);
 
-           
+
 
             var filteredSales = _context.SalesRecord
                 .OrderByDescending(x => x.Date)
@@ -126,47 +120,47 @@ namespace SalesWebMvc.Services
             var end = TimeZoneInfo.ConvertTimeToUtc(finalDate.Date.AddDays(1).AddTicks(-1), timeZone);
 
 
-       
-           
 
-                var sales = await _context.SalesRecord
-        .Where(x => x.Date >= initial && x.Date <= end)
-        .Select(x => new SalesReadDto
+
+
+            var sales = await _context.SalesRecord
+    .Where(x => x.Date >= initial && x.Date <= end)
+    .Select(x => new SalesReadDto
+    {
+        Date = x.Date,
+        Amount = x.Amount,
+        Status = x.SaleStatus,
+        Id = x.Id,
+        SellerName = x.Seller.Name,
+        SellerDto = new SellerReadDto
         {
-            Date = x.Date,
-            Amount = x.Amount,
-            Status = x.SaleStatus,
-            Id = x.Id,
-            SellerName = x.Seller.Name,
-            SellerDto = new SellerReadDto
-            {
-                BaseSalary = x.Seller.BaseSalary,
-                Name = x.Seller.Name,
-                BirthDate = x.Seller.BirthDate,
-                Email = x.Seller.Email,
-                DepartmentId = x.Seller.Department.Id,
-                DepartmentName = x.Seller.Department.Name,
-                Id = x.Seller.Id
-            }
-        })
-        .ToListAsync();
+            BaseSalary = x.Seller.BaseSalary,
+            Name = x.Seller.Name,
+            BirthDate = x.Seller.BirthDate,
+            Email = x.Seller.Email,
+            DepartmentId = x.Seller.Department.Id,
+            DepartmentName = x.Seller.Department.Name,
+            Id = x.Seller.Id
+        }
+    })
+    .ToListAsync();
 
-                var grouped = sales
-             .GroupBy(x => x.SellerDto.DepartmentName)
-             .Select(g => new GroupedSalesDto
-             {
-                 DepartmentName = g.Key,
-                 Sales = g.ToList()
-             })
-             .ToList();
+            var grouped = sales
+         .GroupBy(x => x.SellerDto.DepartmentName)
+         .Select(g => new GroupedSalesDto
+         {
+             DepartmentName = g.Key,
+             Sales = g.ToList()
+         })
+         .ToList();
 
-                return grouped;
-            }
+            return grouped;
+        }
 
 
 
 
-        
+
 
 
         public async Task<SalesReadDto> GetSaleById(int id)
@@ -193,7 +187,7 @@ namespace SalesWebMvc.Services
 
         }
 
-         
+
         public async Task<List<SalesReadDto>> FindAllAsync()
         {
 
