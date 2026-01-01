@@ -26,15 +26,6 @@ namespace SalesWebMvc.Controllers
             {
                 var response = _authService.Register(registerRequest);
 
-                Response.Cookies.Append("token", response.Token, new CookieOptions
-                {
-                    HttpOnly = true,
-                    SameSite = SameSiteMode.Lax,
-                    Secure = false,
-                    Expires = DateTime.UtcNow.AddMinutes(20)
-
-                });
-
                 return Ok(response);
             }
             catch (BusinessException ex)
@@ -54,17 +45,8 @@ namespace SalesWebMvc.Controllers
             {
                 var response = _authService.Login(loginRequest);
 
-                Response.Cookies.Append("token", response.Token, new CookieOptions
-                {
-                    HttpOnly = true,   // protege contra acesso via JS
-                    Secure = false,
-                    SameSite = SameSiteMode.Lax,
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(20)
-                });
-
-                
-
-
+               
+               
                 return Ok(response);
             }
             catch (AuthenticationException)
