@@ -14,12 +14,12 @@ O projeto foi desenvolvido usando ASP.NET Core MVC com Entity Framework Core e P
 ---
 
 ## 🚀 Tecnologias Utilizadas
-
+Back-end:
 - ASP.NET Core MVC
 - Entity Framework Core
 - PostgreSQL
-- React
-- Vite.js
+  
+Front-End:
 - Next.js 15+ 
 - Tailwind CSS / Shadcn UI
 
