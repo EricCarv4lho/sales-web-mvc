@@ -8,13 +8,18 @@
 
         public ICollection<Seller> Sellers { get; set; } = new List<Seller>();
 
+        public Guid UserId { get; set; }
+
+       
+
 
         public Department() { }
 
-        public Department(string name)
+        public Department(string name, Guid userGuid)
         {
            
             Name = name;
+            UserId = userGuid;
 
         }
 

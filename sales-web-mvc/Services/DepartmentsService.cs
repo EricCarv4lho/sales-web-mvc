@@ -17,10 +17,11 @@ namespace SalesWebMvc.Services
         }
 
 
-        public async Task<List<DepartmentReadDto>> FindAllAsync()
+        public async Task<List<DepartmentReadDto>> FindAllAsync(Guid userId)
         {
 
-            List<DepartmentReadDto> departmentReadList = await _context.Department
+
+            List<DepartmentReadDto> departmentReadList = await _context.Department.Where(d => d.UserId == userId)
          .OrderBy(d => d.Name)
          .Select(d => new DepartmentReadDto
          {
@@ -33,6 +34,7 @@ namespace SalesWebMvc.Services
                  Email = s.Email
              }).ToList()
          })
+         
          .ToListAsync();
 
             return departmentReadList;
@@ -71,7 +73,7 @@ namespace SalesWebMvc.Services
         }
 
 
-        public async Task<DepartmentReadDto> CreateDepartmentAsync(DepartmentCreateDto dto)
+        public async Task<DepartmentReadDto> CreateDepartmentAsync(DepartmentCreateDto dto, Guid userGuid)
         {
             if(dto.Name == null)
             {
@@ -80,13 +82,13 @@ namespace SalesWebMvc.Services
 
 
             bool nameExists = await _context.Department
-                .AnyAsync(d => d.Name == dto.Name);
+                .AnyAsync(d => d.Name == dto.Name && d.UserId == userGuid);
 
             if (nameExists)
                 throw new BusinessException("A department with this name already exists.");
 
 
-            Department department = new(dto.Name);
+            Department department = new(dto.Name, userGuid);
 
             _context.Department.Add(department);
             await _context.SaveChangesAsync();

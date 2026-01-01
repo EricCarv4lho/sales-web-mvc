@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SalesWebMvc.Dto;
+using SalesWebMvc.Models;
 using SalesWebMvc.Services;
 using SalesWebMvc.Services.Exceptions;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 namespace SalesWebMvc.Controllers
 {
     [ApiController]
@@ -25,8 +28,14 @@ namespace SalesWebMvc.Controllers
         public async Task<ActionResult<IEnumerable<DepartmentReadDto>>> GetDepartments()
 
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+             ?? User.FindFirst("sub")?.Value;
 
-            List<DepartmentReadDto> departmentsDtoList = await _service.FindAllAsync();
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+            Guid userGuid = Guid.Parse(userId);
+
+            List<DepartmentReadDto> departmentsDtoList = await _service.FindAllAsync(userGuid);
 
             return Ok(departmentsDtoList);
 
@@ -83,14 +92,27 @@ namespace SalesWebMvc.Controllers
         public async Task<ActionResult<DepartmentReadDto>> PostDepartment(DepartmentCreateDto dto)
         {
 
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+             ?? User.FindFirst("sub")?.Value;
+
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { message = "Unauthorized" });
+            }
+
             if (dto == null || string.IsNullOrWhiteSpace(dto.Name))
             {
                 return BadRequest(new { error = "Department data is required." });
             }
 
+
+            Guid userGuid = Guid.Parse(userId);
+
             try
             {
-                DepartmentReadDto departmentRead = await _service.CreateDepartmentAsync(dto);
+                DepartmentReadDto departmentRead = await _service.CreateDepartmentAsync(dto, userGuid);
 
                 return CreatedAtAction(nameof(GetDepartment), new { id = departmentRead.Id }, departmentRead);
             }
