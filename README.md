@@ -1,4 +1,4 @@
-# 🧾 Sales Web MVC
+# 🧾 Sales Web System
 
 Aplicação web para simular um sistema de listagem de vendedores e seus departamentos. Permite:
 
@@ -20,6 +20,8 @@ O projeto foi desenvolvido usando ASP.NET Core MVC com Entity Framework Core e P
 - PostgreSQL
 - React
 - Vite.js
+- Next.js 15+ 
+- Tailwind CSS / Shadcn UI
 
 ---
 
