@@ -2,16 +2,17 @@
 using SalesWebMvc.Data;
 using SalesWebMvc.Dto;
 using SalesWebMvc.Models;
+using SalesWebMvc.Services.Exceptions;
 using System.Security.Authentication;
 
 namespace SalesWebMvc.Services
 {
     public class AuthService
-    {  
+    {
         private readonly SalesWebMvcContext _context;
 
         private TokenService? _tokenService;
-        
+
         public AuthService(SalesWebMvcContext context, TokenService tokenService)
         {
             _context = context;
@@ -20,25 +21,25 @@ namespace SalesWebMvc.Services
 
         public AuthResponse Register(RegisterRequest registerRequest)
         {
-            if (string.IsNullOrWhiteSpace(registerRequest.email) || string.IsNullOrWhiteSpace(registerRequest.password))            
-                throw new ArgumentNullException("Invalid credentials");
-            
+            if (string.IsNullOrWhiteSpace(registerRequest.email) || string.IsNullOrWhiteSpace(registerRequest.password))
+                throw new BusinessException("Email and password are required.");
 
-            if(registerRequest.password != registerRequest.confirmPassword)            
-                throw new ArgumentException("Password and confirmation password do not match.");
-            
 
-            if(_context.User.Any(x => x.Email.Equals(registerRequest.email)))    
-                throw new InvalidOperationException("Email is already registered.");
-            
+            if (registerRequest.password != registerRequest.confirmPassword)
+                throw new BusinessException("Password and confirmation password do not match.");
+
+
+            if (_context.User.Any(x => x.Email.Equals(registerRequest.email)))
+                throw new BusinessException("Email is already registered.");
+
 
             var encryptedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.password);
 
 
-            User user = new(registerRequest.email,encryptedPassword, "USER");
+            User user = new(registerRequest.email, encryptedPassword, "USER");
 
-           
-            
+
+
             _context.User.Add(user);
 
             _context.SaveChanges();
@@ -55,25 +56,25 @@ namespace SalesWebMvc.Services
 
             if (user == null)
             {
-                throw new SecurityTokenException("Invalid credentials");
+                throw new AuthenticationException("Invalid credentials");
             }
 
             bool passwordIsValid = BCrypt.Net.BCrypt.Verify(loginRequest.password, user.Password);
 
             if (!passwordIsValid)
             {
-                throw new SecurityTokenException("Invalid credentials");
+                throw new AuthenticationException("Invalid credentials");
             }
 
             var jwtToken = _tokenService.GenerateToken(user);
 
             return new AuthResponse(jwtToken);
-            
+
         }
     }
 
-  
-    
 
-    
+
+
+
 }

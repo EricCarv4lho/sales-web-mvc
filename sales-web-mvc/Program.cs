@@ -98,7 +98,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173") 
+        policy.WithOrigins("http://localhost:3000") 
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -127,6 +127,7 @@ app.UseRequestLocalization(localizationOptions);
 // Middleware
 if (app.Environment.IsDevelopment())
 {
+    
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -135,10 +136,10 @@ else
     app.UseSwagger();        
     app.UseSwaggerUI();     
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
 
-// Segurança e CORS
-app.UseHttpsRedirection();
+
 app.UseCors("AllowFrontend");
 
 app.UseRouting();

@@ -1,15 +1,17 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using SalesWebMvc.Dto;
 using SalesWebMvc.Services;
+using SalesWebMvc.Services.Exceptions;
 
 namespace SalesWebMvc.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : Controller
-    { 
-        
+    {
+
         private readonly AuthService _authService;
 
         public AuthController(AuthService authService)
@@ -23,11 +25,25 @@ namespace SalesWebMvc.Controllers
             try
             {
                 var response = _authService.Register(registerRequest);
+
+                Response.Cookies.Append("token", response.Token, new CookieOptions
+                {
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Lax,
+                    Secure = false,
+                    Expires = DateTime.UtcNow.AddMinutes(20)
+
+                });
+
                 return Ok(response);
             }
-            catch(Exception ex)
+            catch (BusinessException ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Erro interno no servidor." });
             }
         }
 
@@ -37,14 +53,33 @@ namespace SalesWebMvc.Controllers
             try
             {
                 var response = _authService.Login(loginRequest);
+
+                Response.Cookies.Append("token", response.Token, new CookieOptions
+                {
+                    HttpOnly = true,   // protege contra acesso via JS
+                    Secure = false,
+                    SameSite = SameSiteMode.Lax,
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(20)
+                });
+
+                
+
+
                 return Ok(response);
             }
-            catch(Exception ex)
+            catch (AuthenticationException)
             {
-                return BadRequest(new { message = ex.Message });
+                return Unauthorized(new {message = "Credenciais Inválidas"});
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Erro interno do servidor."
+                });
             }
 
-           
+
         }
     }
 }

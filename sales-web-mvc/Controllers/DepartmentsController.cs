@@ -7,7 +7,7 @@ namespace SalesWebMvc.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "USER")]
+    [Authorize]
     public class DepartmentsController : ControllerBase
     {
         private readonly DepartmentsService _service;
@@ -23,6 +23,7 @@ namespace SalesWebMvc.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<DepartmentReadDto>>> GetDepartments()
+
         {
 
             List<DepartmentReadDto> departmentsDtoList = await _service.FindAllAsync();
@@ -37,7 +38,7 @@ namespace SalesWebMvc.Controllers
 
         // GET: api/departments/5
         [HttpGet("{id}")]
-       
+
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<DepartmentReadDto>> GetDepartment(int id)
@@ -63,16 +64,17 @@ namespace SalesWebMvc.Controllers
                     message = ex.Message
                 });
             }
+
             catch (Exception)
             {
 
                 return StatusCode(500, new { error = "An unexpected error occurred." });
             }
         }
-          
 
 
-        
+
+
 
         // POST: api/departments
 
@@ -83,7 +85,7 @@ namespace SalesWebMvc.Controllers
 
             if (dto == null || string.IsNullOrWhiteSpace(dto.Name))
             {
-                return BadRequest("Department data is required.");
+                return BadRequest(new { error = "Department data is required." });
             }
 
             try
@@ -131,7 +133,7 @@ namespace SalesWebMvc.Controllers
 
         // DELETE: api/departments/5
         [HttpDelete("{id}")]
-        
+
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
