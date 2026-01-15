@@ -9,8 +9,9 @@ export default function DepartmentsPage() {
 
   return (
     <div>
-      <section className="bg-blue-600 min-h-screen ">
+      <section className="bg-blue-50 min-h-screen ">
         <DepartmentsTable/>
+        
       </section>
     </div>
   );

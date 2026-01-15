@@ -11,7 +11,7 @@ export default function DepartmentsLayout({ children }: { children: React.ReactN
               <Link href={"/dashboard"}><li>Home</li></Link>
               <Link href={"/departments"} className="text-blue-600"><li>Departmentos</li></Link>
               <Link href={"/sellers"}><li>Vendedores</li></Link>
-              <Link href={"/sales"}><li>Vendas</li></Link>
+              <Link href={"#"}><li>Vendas</li></Link>
             </ul>
             
         </nav>
