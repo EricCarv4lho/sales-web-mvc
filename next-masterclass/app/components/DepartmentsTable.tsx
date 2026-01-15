@@ -99,13 +99,13 @@ export default function DepartmentsTable() {
   return (
     <div>
       <div className=" container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center gap-10 items-center ">
-        <Card className=" border border-dashed bg-amber-50/2 w-2xs  text-center  ">
+        <Card className=" border border-dashed bg-white w-2xs  text-center  ">
           <CardContent className="flex flex-col gap-3 items-center text-center justify-center">
-            <p className="text-white">Novo Departamento</p>
+            <p className="text-blue-900">Novo Departamento</p>
             <CirclePlus
               onClick={handleClickNewDepartment}
-              className="cursor-pointer transition-all duration-200 ease-in-out  hover:scale-125 "
-              color="white"
+              className="cursor-pointer transition-all duration-200 ease-in-out  hover:scale-125 text-blue-900 "
+              
             />
           </CardContent>
         </Card>
