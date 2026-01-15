@@ -7,7 +7,7 @@ namespace SalesWebMvc.Controllers
 { 
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "USER")]
+    [Authorize]
     public class SellersController : ControllerBase
     {
         private readonly SellerService _sellerService;
