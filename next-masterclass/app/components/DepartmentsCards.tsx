@@ -10,7 +10,7 @@ export default function DepartmentsCards({ name }: Department) {
     <div>
       <Card className="hover:shadow-lg transition-shadow w-2xs  ">
         <CardHeader>
-          <CardTitle>{name}</CardTitle>
+          <CardTitle className="text-blue-900" >{name}</CardTitle>
         </CardHeader>
       </Card>
     </div>
