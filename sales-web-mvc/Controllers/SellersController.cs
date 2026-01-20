@@ -123,7 +123,7 @@ namespace SalesWebMvc.Controllers
             try
             {
                 await _sellerService.RemoveSellerAsync(id);
-                return Ok();
+                return NoContent();
             }
 
             catch (NotFoundException)

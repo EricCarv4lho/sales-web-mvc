@@ -20,7 +20,7 @@ namespace SalesWebMvc.Services
 
         public async Task<List<SellerReadDto>> FindAllAsync()
         {
-            var sellers = await _context.Seller.Select(s => new SellerReadDto
+            var sellers = await _context.Seller.Where(s => s.IsActive).Select(s => new SellerReadDto
             {
                 Id = s.Id,
                 Name = s.Name,
@@ -83,7 +83,7 @@ namespace SalesWebMvc.Services
             }
             else
             {
-                _context.Remove(seller);
+                seller.IsActive = false;
 
             }
 
@@ -129,7 +129,7 @@ namespace SalesWebMvc.Services
             birthDateSeller = DateTime.SpecifyKind(birthDateSeller, DateTimeKind.Utc);
 
 
-            Seller seller = new(dto.Name, dto.Email, birthDateSeller, dto.BaseSalary, department);
+            Seller seller = new(dto.Name, dto.Email, birthDateSeller, dto.BaseSalary, true, department);
 
             _context.Seller.Add(seller);
             await _context.SaveChangesAsync();
