@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import FetchSellersAction from "../actions/FetchSellersAction";
+import ModalDeleteSeller from "./ModalDeleteSeller";
+import DeleteSeller from "../actions/DeleteSeller";
 
 interface Seller {
   id: number;
@@ -13,33 +15,26 @@ interface Seller {
   departmentName: string;
 }
 
-export default function SellersCard() {
-  const [sellers, setSellers] = useState<Seller[]>([]);
 
-  const fetchSellers = async () => {
-    const result = await FetchSellersAction();
+interface TableSellerProps {
+  sellerList: Seller[];
+  onDelete: (id: number) => {};
+}
 
-    if (result.success) {
-      const data = result.data;
+export default function SellersCard({sellerList, onDelete}: TableSellerProps) {
 
-      const formatted = data.map((s: any) => ({
-        ...s,
-        birthDate: new Date(s.birthDate).toLocaleDateString("pt-BR"),
-      }));
+  const [modalDelete, setModalDelete] = useState(false);
+  const [selectedSellerId, setSelectedSellerId] = useState(0);
 
-      setSellers(formatted);
-    } else {
-      console.error(result.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchSellers();
-  }, []);
+  
+    const onCloseModal = () => {
+      setModalDelete(false);
+    };
+  
 
   return (
     <div>
-      {sellers.map((s) => (
+      {sellerList.map((s) => (
         <div key={s.id} className="rounded-2xl bg-white p-4 shadow-sm">
           <p className="font-semibold text-blue-900"></p>
           <p className="text-sm text-gray-600">{s.name}</p>
@@ -49,12 +44,21 @@ export default function SellersCard() {
             <button className="flex-1 rounded-lg border border-blue-600 px-3 py-2 text-blue-600">
               Editar
             </button>
-            <button className="flex-1 rounded-lg border border-red-500 px-3 py-2 text-red-500">
+            <button onClick={() => {
+              setModalDelete(true);
+              setSelectedSellerId(s.id)}} className="flex-1 rounded-lg border border-red-500 px-3 py-2 text-red-500">
               Excluir
             </button>
           </div>
         </div>
       ))}
+
+      
+
+      {modalDelete && (
+        <ModalDeleteSeller onDelete={() => onDelete(selectedSellerId)} onClose={onCloseModal} />
+      )}
+
     </div>
   );
 }
