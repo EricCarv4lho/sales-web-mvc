@@ -1,11 +1,12 @@
 "use client";
 
 import CreateNewSeller from "@/app/actions/CreateNewSeller";
+import DeleteSeller from "@/app/actions/DeleteSeller";
 import FetchSellersAction from "@/app/actions/FetchSellersAction";
 import FormNewSeller from "@/app/components/FormNewSeller";
 import SellersCard from "@/app/components/SellersCards";
 import SellersTable from "@/app/components/SellersTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function SellersPage() {
   interface Seller {
@@ -16,6 +17,7 @@ export default function SellersPage() {
     birthDate: string;
     departmentId: number;
     departmentName: string;
+    isActive: boolean
   }
 
   const [formNewSeller, setFormNewSeller] = useState(false);
@@ -33,22 +35,43 @@ export default function SellersPage() {
     setFormNewSeller(false);
   };
 
+  
   const fetchSellers = async () => {
-    const result = await FetchSellersAction();
+     const result = await FetchSellersAction();
+ 
+     if (result.success) {
+       const data = result.data;
+ 
+       const formatted = data.map((s: any) => ({
+         ...s,
+         birthDate: new Date(s.birthDate).toLocaleDateString("pt-BR"),
+       }));
+ 
+       setSellers(formatted);
+     } else {
+       console.error(result.message);
+     }
+   };
 
-    if (result.success) {
-      setSellers(result.data);
-    } else {
-      alert("Erro ao criar vendedor");
-    }
-  };
+   const handleDeleteSeller = async (id: number) => {
+  const result = await DeleteSeller(id);
+
+  if (result.success) {
+    setSellers(prev => prev.filter(s => s.id !== id));
+  }
+};
+
+ 
+   useEffect(() => {
+    fetchSellers();
+   }, [])
 
   const onSubmitCreateSeller = async (data: SellerModelProps) => {
 
 
     const result = await CreateNewSeller(data);
     if (result.success) {
-      fetchSellers();
+      await fetchSellers();
       setFormNewSeller(false);
     } else {
       alert("Erro ao criar departamento no servidor");
@@ -73,10 +96,10 @@ export default function SellersPage() {
 
       {/* Mobile Cards */}
       <div className="flex  flex-col gap-4 sm:hidden">
-        <SellersCard />
+        <SellersCard onDelete={handleDeleteSeller} sellerList={sellers} />
       </div>
 
-      <SellersTable />
+      <SellersTable sellerList={sellers} onDelete={handleDeleteSeller}/>
 
       {formNewSeller && (
         <div  onClick={() => {
