@@ -29,7 +29,7 @@ export default function DepartmentsTable() {
 
   const [departments, setDepartments] = useState<Department[]>([]);
 
- 
+
 
   const selectedDepartment = departments.find(
     (dep) => dep.id === selectedDepartmentId
@@ -82,16 +82,16 @@ export default function DepartmentsTable() {
   };
 
 
-  const onDelete = async (id : number) => {
+  const onDelete = async (id: number) => {
 
-    
+
     const result = await DeleteDepartment(id);
 
-    if(result.success){
+    if (result.success) {
       await fetchDepartments();
       setFormDepartmentDetails(false)
     }
-    else{
+    else {
       alert("Erro ao Deletar " + result.message)
     }
   }
@@ -105,7 +105,7 @@ export default function DepartmentsTable() {
             <CirclePlus
               onClick={handleClickNewDepartment}
               className="cursor-pointer transition-all duration-200 ease-in-out  hover:scale-125 text-blue-900 "
-              
+
             />
           </CardContent>
         </Card>
@@ -124,29 +124,33 @@ export default function DepartmentsTable() {
       </div>
 
       {formNewDepartment && (
-        <div className="fixed inset-0 bg-black/50  backdrop-blur-sm flex justify-center items-center ">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
           <div
             className="absolute inset-0 cursor-pointer"
             onClick={() => setFormNewDepartment(false)}
           ></div>
-          <FormNewDepartment onCreate={onSubmitCreateDepartment} />
+          <div className="relative z-10">
+            <FormNewDepartment onCreate={onSubmitCreateDepartment} onCancel={() => setFormNewDepartment(false)} />
+          </div>
         </div>
       )}
 
       {formDepartmentDetails && selectedDepartment && (
-        <div className="fixed inset-0 bg-black/50  backdrop-blur-sm flex justify-center items-center ">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
           <div
             className="absolute inset-0 cursor-pointer "
             onClick={() => setFormDepartmentDetails(false)}
           ></div>
-          
-          
-          <FormUpdateDepartment
-            department={selectedDepartment}
-            onUpdate={onUpdate}
-            onDelete={onDelete}
-            
-          />
+
+
+          <div className="relative z-10">
+            <FormUpdateDepartment
+              department={selectedDepartment}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
+              onCancel={() => setFormDepartmentDetails(false)}
+            />
+          </div>
         </div>
       )}
     </div>
