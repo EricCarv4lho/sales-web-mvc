@@ -1,8 +1,8 @@
-# 🧾 Sales Web System
+# 🧾 SalesOps
 
-Aplicação web para simular um sistema de listagem de vendedores e seus departamentos. Permite:
+Aplicação web para gestão de departamentos, usuários e vendas. Permite:
 
-- Consultar vendedores e departamentos
+- Consultar vendedores, departamentos e vendas
 - Adicionar novos registros
 - Atualizar dados existentes
 - Excluir registros
