@@ -1,4 +1,4 @@
-# 🧾 SaleOps
+# 🧾 SalesOps
 
 Aplicação web para gestão de departamentos, usuários e vendas. Permite:
 
