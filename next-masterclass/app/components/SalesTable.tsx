@@ -21,7 +21,7 @@ interface SalesRecord {
     id: number;
     date: string;
     amount: number;
-    status: SaleStatus;
+    status: string;
     sellerName: string;
     sellerDto: SellerDto;
 }
@@ -31,29 +31,29 @@ interface SalesTableProps {
 }
 
 export default function SalesTable({ sales, onEdit }: SalesTableProps & { onEdit?: (sale: SalesRecord) => void }) {
-    const getStatusColor = (status: SaleStatus) => {
+    const getStatusColor = (status: string) => {
+
+
         switch (status) {
-            case SaleStatus.Faturado:
+            case 'Faturado':
                 return "bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20";
-            case SaleStatus.Pendente:
+            case 'Pendente':
                 return "bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-600/20";
-            case SaleStatus.Cancelado:
+            case 'Cancelado':
                 return "bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/10";
-            default:
-                return "bg-gray-50 text-gray-600 ring-1 ring-inset ring-gray-500/10";
+
         }
     };
 
-    const getStatusLabel = (status: SaleStatus) => {
+    const getStatusLabel = (status: string) => {
         switch (status) {
-            case SaleStatus.Faturado:
+            case 'Faturado':
                 return "Faturado";
-            case SaleStatus.Pendente:
+            case 'Pendente':
                 return "Pendente";
-            case SaleStatus.Cancelado:
+            case 'Cancelado':
                 return "Cancelado";
-            default:
-                return "Desconhecido";
+
         }
     };
 

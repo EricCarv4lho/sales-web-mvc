@@ -23,7 +23,7 @@ interface SalesRecord {
     id: number;
     date: string;
     amount: number;
-    status: SaleStatus;
+    status: string;
     sellerName: string;
     sellerDto: SellerDto;
 }
@@ -34,26 +34,26 @@ interface SalesCardProps {
 
 export default function SalesCard({ sales }: SalesCardProps) {
 
-    const getStatusColor = (status: SaleStatus) => {
+    const getStatusColor = (status: string) => {
         switch (status) {
-            case SaleStatus.Faturado:
+            case "Faturado":
                 return "bg-green-100 text-green-800 border-green-200";
-            case SaleStatus.Pendente:
+            case "Pendente":
                 return "bg-yellow-100 text-yellow-800 border-yellow-200";
-            case SaleStatus.Cancelado:
+            case "Cancelado":
                 return "bg-red-100 text-red-800 border-red-200";
             default:
                 return "bg-gray-100 text-gray-800 border-gray-200";
         }
     };
 
-    const getStatusLabel = (status: SaleStatus) => {
+    const getStatusLabel = (status: string) => {
         switch (status) {
-            case SaleStatus.Faturado:
+            case "Faturado":
                 return "Faturado";
-            case SaleStatus.Pendente:
+            case "Pendente":
                 return "Pendente";
-            case SaleStatus.Cancelado:
+            case "Cancelado":
                 return "Cancelado";
             default:
                 return "Desconhecido";
