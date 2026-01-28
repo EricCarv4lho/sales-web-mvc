@@ -11,7 +11,7 @@ namespace SalesWebMvc.Services
     {
         private readonly SalesWebMvcContext _context;
 
-        private TokenService? _tokenService;
+        private readonly TokenService _tokenService;
 
         public AuthService(SalesWebMvcContext context, TokenService tokenService)
         {
@@ -22,15 +22,15 @@ namespace SalesWebMvc.Services
         public AuthResponse Register(RegisterRequest registerRequest)
         {
             if (string.IsNullOrWhiteSpace(registerRequest.email) || string.IsNullOrWhiteSpace(registerRequest.password))
-                throw new BusinessException("Email and password are required.");
+                throw new AuthenticationException("Email and password are required.");
 
 
             if (registerRequest.password != registerRequest.confirmPassword)
-                throw new BusinessException("Password and confirmation password do not match.");
+                throw new AuthenticationException("Password and confirmation password do not match.");
 
 
             if (_context.User.Any(x => x.Email.Equals(registerRequest.email)))
-                throw new BusinessException("Email is already registered.");
+                throw new AuthenticationException("Email is already registered.");
 
 
             var encryptedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.password);

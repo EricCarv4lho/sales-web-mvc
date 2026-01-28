@@ -28,7 +28,7 @@ namespace SalesWebMvc.Controllers
 
                 return Ok(response);
             }
-            catch (BusinessException ex)
+            catch (AuthenticationException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
@@ -45,13 +45,13 @@ namespace SalesWebMvc.Controllers
             {
                 var response = _authService.Login(loginRequest);
 
-               
-               
+
+
                 return Ok(response);
             }
             catch (AuthenticationException)
             {
-                return Unauthorized(new {message = "Credenciais Inválidas"});
+                return Unauthorized(new { message = "Credenciais Inválidas" });
             }
             catch (Exception)
             {
