@@ -9,7 +9,9 @@ namespace SalesWebMvc.Models
         public double Amount { get; set; }
         public SaleStatus SaleStatus { get; set; }
         public int SellerId { get; set; }
-        public Seller Seller { get; set; }
+
+        public bool IsActive { get; set; } = true;
+        public Seller Seller { get; set; } = new();
 
 
         public SalesRecord() { }

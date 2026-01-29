@@ -9,7 +9,7 @@
         public DateTime BirthDate { get; set; }
         public double BaseSalary { get; set; }
 
-        public Department Department { get; set; }
+        public Department Department { get; set; } = new();
 
         public int DepartmentId { get; set; }
 
