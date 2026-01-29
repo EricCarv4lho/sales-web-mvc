@@ -8,9 +8,9 @@ namespace SalesWebMvc.Dto
         public DateTime Date { get; set; }
         public double Amount { get; set; }
         public SaleStatus Status { get; set; }
-        public string SellerName { get; set; }
+        public string SellerName { get; set; } = string.Empty;
 
-        public SellerReadDto SellerDto { get; set; }
+        public SellerReadDto SellerDto { get; set; } = new();
         
         public SalesReadDto() { }
         public SalesReadDto(DateTime date, double amount, SaleStatus status, string sellerName )
@@ -20,8 +20,6 @@ namespace SalesWebMvc.Dto
             Status = status;
             SellerName = sellerName;
             
-            
-           
         }
 
         public SalesReadDto(DateTime date, double amount, SaleStatus status, SellerReadDto sellerReadDto)

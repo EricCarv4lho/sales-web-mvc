@@ -96,5 +96,47 @@ namespace SalesWebMvc.Controllers
             }
         }
 
-    }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateSale(int id, SalesCreateDto dto)
+        {
+
+            try
+            {
+                await _salesRecordsService.UpdateSales(id, dto);
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (BusinessException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "An unexpected error occurred." });
+
+            }
+
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSale(int id)
+        {
+            try
+            {
+                await _salesRecordsService.DeleteSaleAsync(id);
+
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "An unexpected error occurred." });
+            }
+        } }
 }

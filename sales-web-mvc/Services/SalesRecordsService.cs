@@ -48,26 +48,27 @@ namespace SalesWebMvc.Services
 
             dateSale = DateTime.SpecifyKind(dateSale, DateTimeKind.Utc);
 
-            Seller? seller = await _context.Seller.FirstOrDefaultAsync(x => x.Id == saleCreateDto.SellerId) ?? throw new NotFoundException("Seller not found.");
-            
+            Seller seller = await _context.Seller.FirstOrDefaultAsync(x => x.Id == saleCreateDto.SellerId) ?? throw new NotFoundException("Seller not found.");
+
+
             SalesRecord sale = new(dateSale, saleCreateDto.Amount, status, seller);
 
-                
 
-                _context.SalesRecord.Add(sale);
-                await _context.SaveChangesAsync();
 
-                SalesReadDto saleRead = new()
-                {
-                    Id = sale.Id,
-                    Amount = sale.Amount,
-                    Date = sale.Date,
-                    SellerName = sale.Seller.Name,
-                    Status = sale.SaleStatus
-                };
-                return saleRead;
-            
-            
+            _context.SalesRecord.Add(sale);
+            await _context.SaveChangesAsync();
+
+            SalesReadDto saleRead = new()
+            {
+                Id = sale.Id,
+                Amount = sale.Amount,
+                Date = sale.Date,
+                SellerName = sale.Seller.Name,
+                Status = sale.SaleStatus
+            };
+            return saleRead;
+
+
 
 
 
@@ -86,7 +87,7 @@ namespace SalesWebMvc.Services
 
             var filteredSales = _context.SalesRecord
                 .OrderByDescending(x => x.Date)
-                .Where(x => x.Date >= initial && x.Date <= end)
+                .Where(x => x.Date >= initial && x.Date <= end && x.IsActive)
                 .Select(x => new SalesReadDto
                 {
                     Date = x.Date,
@@ -124,7 +125,7 @@ namespace SalesWebMvc.Services
 
 
             var sales = await _context.SalesRecord
-    .Where(x => x.Date >= initial && x.Date <= end)
+    .Where(x => x.Date >= initial && x.Date <= end && x.IsActive)
     .Select(x => new SalesReadDto
     {
         Date = x.Date,
@@ -192,7 +193,7 @@ namespace SalesWebMvc.Services
         {
 
 
-            List<SalesReadDto> sales = await _context.SalesRecord.Select(s => new SalesReadDto
+            List<SalesReadDto> sales = await _context.SalesRecord.Where(s => s.IsActive == true).Select(s => new SalesReadDto
             {
                 Id = s.Id,
                 Amount = s.Amount,
@@ -206,6 +207,36 @@ namespace SalesWebMvc.Services
             return sales;
 
 
+        }
+
+        public async Task UpdateSales(int id, SalesCreateDto dto)
+        {
+
+            var sale = await _context.SalesRecord.FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException("Sale not found.");
+
+            sale.SaleStatus = (SaleStatus)dto.Status;
+            sale.Amount = dto.Amount;
+            bool isDateValid = DateTime.TryParseExact(dto.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateSale);
+            if (!isDateValid)
+                throw new BusinessException("Date is not valid.");
+            dateSale = DateTime.SpecifyKind(dateSale, DateTimeKind.Utc);
+            sale.Date = dateSale;
+            Seller seller = await _context.Seller.FirstOrDefaultAsync(x => x.Id == dto.SellerId) ?? throw new NotFoundException("Seller not found.");
+            sale.Seller = seller;
+
+            await _context.SaveChangesAsync();
+
+
+
+        }
+
+
+        public async Task DeleteSaleAsync(int id)
+        {
+            SalesRecord? sale = await _context.SalesRecord.FirstOrDefaultAsync(s => s.Id == id) ?? throw new NotFoundException("Sale not found.");
+
+            sale.IsActive = false;
+            await _context.SaveChangesAsync();
         }
     }
 }
