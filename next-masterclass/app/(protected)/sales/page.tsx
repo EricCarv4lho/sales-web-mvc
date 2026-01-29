@@ -10,6 +10,8 @@ import SalesTable from "@/app/components/SalesTable";
 import FormNewSale from "@/app/components/FormNewSale";
 import { DollarSign, Plus, Search } from "lucide-react";
 import Link from "next/link";
+import ModalDeleteSales from "@/app/components/ModalDeleteSales";
+import DeleteSaleAction from "@/app/actions/DeleteSaleAction";
 
 enum SaleStatus {
     Pendente = 0,
@@ -32,7 +34,7 @@ interface SalesRecord {
     id: number;
     date: string;
     amount: number;
-    status: SaleStatus;
+    status: string;
     sellerName: string;
     sellerDto: SellerDto;
 }
@@ -46,7 +48,7 @@ interface SaleModelProps {
     id?: number;
     date: string;
     amount: number;
-    status: number;
+    status: string;
     sellerId: number;
 }
 
@@ -56,6 +58,7 @@ export default function SalesPage() {
     const [sellers, setSellers] = useState<Seller[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
     const [editingSale, setEditingSale] = useState<SalesRecord | null>(null);
 
     async function fetchData() {
@@ -100,7 +103,7 @@ export default function SalesPage() {
 
     const handleUpdateSale = async (data: SaleModelProps) => {
         try {
-            const result = await UpdateSaleAction(data as any);
+            const result = await UpdateSaleAction(data as any, data.id as number);
             if (result.success) {
                 setIsModalOpen(false);
                 setEditingSale(null);
@@ -117,6 +120,16 @@ export default function SalesPage() {
         setEditingSale(sale);
         setIsModalOpen(true);
     };
+
+    const handleDeleteSale = async (id: number) => {
+        const result = await DeleteSaleAction(id);
+        if (result.success) {
+            fetchData();
+        } else {
+            alert("Erro ao excluir: " + result.message);
+        }
+    };
+
 
     const handleModalClose = () => {
         setIsModalOpen(false);
@@ -168,10 +181,10 @@ export default function SalesPage() {
             {/* Content */}
             <div className="w-full">
                 <div className="sm:hidden">
-                    <SalesCard sales={sales} />
+                    <SalesCard sales={sales} onEdit={onEditClick} onDelete={handleDeleteSale} />
                 </div>
                 <div className="hidden sm:block">
-                    <SalesTable sales={sales} onEdit={onEditClick} />
+                    <SalesTable sales={sales} onEdit={onEditClick} onDelete={handleDeleteSale} />
                 </div>
             </div>
 
@@ -196,6 +209,9 @@ export default function SalesPage() {
                     />
                 </div>
             )}
+
+
+
         </div>
     );
 }

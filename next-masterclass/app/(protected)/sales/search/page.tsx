@@ -10,6 +10,7 @@ import GroupedSalesTable from "@/app/components/GroupedSalesTable";
 import FetchSimpleSearchAction from "@/app/actions/FetchSimpleSearchAction";
 import FetchGroupedSearchAction from "@/app/actions/FetchGroupedSearchAction";
 import { Search, TrendingUp } from "lucide-react";
+import DeleteSaleAction from "@/app/actions/DeleteSaleAction";
 
 function SalesSearchContent() {
     const searchParams = useSearchParams();
@@ -22,29 +23,38 @@ function SalesSearchContent() {
     const [loading, setLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
 
-    useEffect(() => {
-        async function fetchData() {
-            if (!minDate || !maxDate) return;
+    async function fetchData() {
+        if (!minDate || !maxDate) return;
 
-            setLoading(true);
-            setHasSearched(true);
-            try {
-                if (activeTab === "simple") {
-                    const result = await FetchSimpleSearchAction(minDate, maxDate);
-                    if (result.success) setSimpleData(result.data);
-                } else {
-                    const result = await FetchGroupedSearchAction(minDate, maxDate);
-                    if (result.success) setGroupedData(result.data);
-                }
-            } catch (error) {
-                console.error("Error fetching data", error);
-            } finally {
-                setLoading(false);
+        setLoading(true);
+        setHasSearched(true);
+        try {
+            if (activeTab === "simple") {
+                const result = await FetchSimpleSearchAction(minDate, maxDate);
+                if (result.success) setSimpleData(result.data);
+            } else {
+                const result = await FetchGroupedSearchAction(minDate, maxDate);
+                if (result.success) setGroupedData(result.data);
             }
+        } catch (error) {
+            console.error("Error fetching data", error);
+        } finally {
+            setLoading(false);
         }
+    }
 
+    useEffect(() => {
         fetchData();
     }, [activeTab, minDate, maxDate]);
+
+    const handleDeleteSale = async (id: number) => {
+        const result = await DeleteSaleAction(id)
+        if (result.success) {
+            fetchData()
+        } else {
+            alert(result.message)
+        }
+    }
 
     const calculateTotalSales = () => {
         if (activeTab === "simple") {
@@ -151,10 +161,10 @@ function SalesSearchContent() {
                         simpleData.length > 0 ? (
                             <>
                                 <div className="sm:hidden">
-                                    <SalesCard sales={simpleData} />
+                                    <SalesCard sales={simpleData} onDelete={handleDeleteSale} />
                                 </div>
                                 <div className="hidden sm:block">
-                                    <SalesTable sales={simpleData} onEdit={() => { }} />
+                                    <SalesTable sales={simpleData} onDelete={handleDeleteSale} />
                                 </div>
                             </>
                         ) : (
@@ -167,10 +177,10 @@ function SalesSearchContent() {
                         groupedData.length > 0 ? (
                             <>
                                 <div className="sm:hidden">
-                                    <GroupedSalesCard groupedSales={groupedData} />
+                                    <GroupedSalesCard groupedSales={groupedData} onDelete={handleDeleteSale} />
                                 </div>
                                 <div className="hidden sm:block">
-                                    <GroupedSalesTable groupedSales={groupedData} />
+                                    <GroupedSalesTable groupedSales={groupedData} onDelete={handleDeleteSale} />
                                 </div>
                             </>
                         ) : (
