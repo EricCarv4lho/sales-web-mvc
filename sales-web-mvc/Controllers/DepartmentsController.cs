@@ -5,6 +5,7 @@ using SalesWebMvc.Models;
 using SalesWebMvc.Services;
 using SalesWebMvc.Services.Exceptions;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq.Expressions;
 using System.Security.Claims;
 namespace SalesWebMvc.Controllers
 {
@@ -28,14 +29,9 @@ namespace SalesWebMvc.Controllers
         public async Task<ActionResult<IEnumerable<DepartmentReadDto>>> GetDepartments()
 
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-             ?? User.FindFirst("sub")?.Value;
 
-            if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-            Guid userGuid = Guid.Parse(userId);
-
-            List<DepartmentReadDto> departmentsDtoList = await _service.FindAllAsync(userGuid);
+            List<DepartmentReadDto> departmentsDtoList = await _service.FindAllAsync();
 
             return Ok(departmentsDtoList);
 
@@ -93,14 +89,8 @@ namespace SalesWebMvc.Controllers
         {
 
 
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-             ?? User.FindFirst("sub")?.Value;
 
 
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized(new { message = "Unauthorized" });
-            }
 
             if (dto == null || string.IsNullOrWhiteSpace(dto.Name))
             {
@@ -108,11 +98,11 @@ namespace SalesWebMvc.Controllers
             }
 
 
-            Guid userGuid = Guid.Parse(userId);
+
 
             try
             {
-                DepartmentReadDto departmentRead = await _service.CreateDepartmentAsync(dto, userGuid);
+                DepartmentReadDto departmentRead = await _service.CreateDepartmentAsync(dto);
 
                 return CreatedAtAction(nameof(GetDepartment), new { id = departmentRead.Id }, departmentRead);
             }
@@ -145,10 +135,19 @@ namespace SalesWebMvc.Controllers
                 await _service.UpdateDepartmentAsync(id, departmentDto);
                 return NoContent();
             }
-            catch (Exception ex) when (ex is NotFoundException || ex is BusinessException || ex is DbConcurrencyException)
+            catch (BusinessException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
+            catch (DbConcurrencyException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "An unexpected error occurred." });
+            }
+
 
 
         }
