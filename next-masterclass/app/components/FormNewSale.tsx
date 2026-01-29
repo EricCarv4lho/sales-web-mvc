@@ -14,7 +14,7 @@ interface SaleModelProps {
     id?: number;
     date: string;
     amount: number;
-    status: number;
+    status: string;
     sellerId: number;
 }
 
@@ -39,7 +39,7 @@ enum SaleStatus {
 export default function FormNewSale({ initialData, sellers, onSubmit, onCancel }: Props) {
     const { register, handleSubmit, formState: { errors }, setValue } = useForm<SaleModelProps>({
         defaultValues: {
-            status: SaleStatus.Pendente
+            status: 'Pendente'
         }
     });
 

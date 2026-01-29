@@ -1,10 +1,11 @@
 "use client";
 
-enum SaleStatus {
-    Pendente = 0,
-    Faturado = 1,
-    Cancelado = 2,
-}
+import { Trash2 } from "lucide-react";
+import { useState } from "react";
+import ModalDeleteSales from "./ModalDeleteSales";
+import DeleteSaleAction from "../actions/DeleteSaleAction";
+
+
 
 interface SellerDto {
     id: number;
@@ -26,11 +27,13 @@ interface SalesRecord {
     sellerDto: SellerDto;
 }
 
+
+
 interface SalesTableProps {
     sales: SalesRecord[];
 }
 
-export default function SalesTable({ sales, onEdit }: SalesTableProps & { onEdit?: (sale: SalesRecord) => void }) {
+export default function SalesTable({ sales, onEdit, onDelete }: SalesTableProps & { onEdit?: (sale: SalesRecord) => void, onDelete: (id: number) => void }) {
     const getStatusColor = (status: string) => {
 
 
@@ -44,6 +47,11 @@ export default function SalesTable({ sales, onEdit }: SalesTableProps & { onEdit
 
         }
     };
+
+
+
+    const [deleteModal, setDeleteModal] = useState(false);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
 
     const getStatusLabel = (status: string) => {
         switch (status) {
@@ -88,11 +96,14 @@ export default function SalesTable({ sales, onEdit }: SalesTableProps & { onEdit
                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                             Status
                         </th>
-                        {onEdit && (
-                            <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                Ações
-                            </th>
-                        )}
+                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Ações
+                        </th>
+
+
+
+
+
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -122,20 +133,52 @@ export default function SalesTable({ sales, onEdit }: SalesTableProps & { onEdit
                                     {getStatusLabel(sale.status)}
                                 </span>
                             </td>
-                            {onEdit && (
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                <div className="flex justify-end gap-3">
+                                    {onEdit && (
+                                        <button
+                                            onClick={() => onEdit(sale)}
+                                            className="text-blue-600 hover:text-blue-900 font-medium"
+                                        >
+                                            Editar
+                                        </button>
+                                    )}
                                     <button
-                                        onClick={() => onEdit(sale)}
-                                        className="text-blue-600 hover:text-blue-900 font-medium"
+                                        onClick={() => {
+                                            setDeleteModal(true);
+                                            setSelectedId(sale.id);
+                                        }}
+                                        className="text-red-500 hover:text-red-700 transition-colors p-1"
+                                        title="Excluir"
                                     >
-                                        Editar
+                                        <Trash2 className="w-5 h-5" />
                                     </button>
-                                </td>
-                            )}
+                                </div>
+                            </td>
+
+
+
+
                         </tr>
                     ))}
                 </tbody>
             </table>
+
+            {deleteModal && selectedId !== null && (
+                <ModalDeleteSales
+                    id={selectedId}
+                    onDelete={async () => {
+                        onDelete(selectedId);
+                        setDeleteModal(false);
+                        setSelectedId(null);
+                    }}
+                    onClose={() => {
+                        setDeleteModal(false);
+                        setSelectedId(null);
+                    }}
+                />
+            )}
         </div>
     );
 }

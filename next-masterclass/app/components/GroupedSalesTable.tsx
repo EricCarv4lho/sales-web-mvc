@@ -1,6 +1,6 @@
-"use client";
-
-import React from "react";
+import React, { useState } from "react";
+import { Trash2 } from "lucide-react";
+import ModalDeleteSales from "./ModalDeleteSales";
 
 enum SaleStatus {
     Pendente = 0,
@@ -35,9 +35,13 @@ interface GroupedSales {
 
 interface GroupedSalesTableProps {
     groupedSales: GroupedSales[];
+    onDelete?: (id: number) => void;
 }
 
-export default function GroupedSalesTable({ groupedSales }: GroupedSalesTableProps) {
+export default function GroupedSalesTable({ groupedSales, onDelete }: GroupedSalesTableProps) {
+    const [deleteModal, setDeleteModal] = useState(false);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
+
     const getStatusColor = (status: SaleStatus) => {
         switch (status) {
             case SaleStatus.Faturado:
@@ -112,6 +116,9 @@ export default function GroupedSalesTable({ groupedSales }: GroupedSalesTablePro
                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Status
                             </th>
+                            <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Ações
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -119,7 +126,7 @@ export default function GroupedSalesTable({ groupedSales }: GroupedSalesTablePro
                             <React.Fragment key={`dept-${group.departmentName}`}>
                                 {/* Department Header Row */}
                                 <tr className="bg-blue-50 border-y border-blue-200">
-                                    <td colSpan={5} className="px-6 py-3">
+                                    <td colSpan={6} className="px-6 py-3">
                                         <div className="flex items-center justify-between">
                                             <span className="font-bold text-blue-900 text-sm">
                                                 {group.departmentName}
@@ -162,6 +169,18 @@ export default function GroupedSalesTable({ groupedSales }: GroupedSalesTablePro
                                                 {getStatusLabel(sale.status)}
                                             </span>
                                         </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <button
+                                                onClick={() => {
+                                                    setDeleteModal(true);
+                                                    setSelectedId(sale.id);
+                                                }}
+                                                className="text-red-500 hover:text-red-700 transition-colors p-1"
+                                                title="Excluir"
+                                            >
+                                                <Trash2 className="w-5 h-5" />
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))}
                             </React.Fragment>
@@ -172,13 +191,28 @@ export default function GroupedSalesTable({ groupedSales }: GroupedSalesTablePro
                             <td colSpan={3} className="px-6 py-4 text-sm uppercase tracking-wide">
                                 Total Geral
                             </td>
-                            <td colSpan={2} className="px-6 py-4 text-base">
+                            <td colSpan={3} className="px-6 py-4 text-base">
                                 {formatCurrency(calculateGrandTotal())}
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
+            {deleteModal && selectedId !== null && (
+                <ModalDeleteSales
+                    id={selectedId}
+                    onDelete={async () => {
+                        onDelete?.(selectedId);
+                        setDeleteModal(false);
+                        setSelectedId(null);
+                    }}
+                    onClose={() => {
+                        setDeleteModal(false);
+                        setSelectedId(null);
+                    }}
+                />
+            )}
         </div>
     );
 }

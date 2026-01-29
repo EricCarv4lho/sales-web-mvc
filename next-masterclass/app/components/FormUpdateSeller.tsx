@@ -48,12 +48,14 @@ export default function FormUpdateSeller({
 
     const [modalDelete, setModalDelete] = useState(false);
 
+  
 
     const formatDateForInput = (dateStr: string) => {
         if (!dateStr) return "";
-      
+        // If it's already YYYY-MM-DD
         if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return dateStr;
 
+        // If it's DD/MM/YYYY (from the frontend formatting we saw earlier)
         const parts = dateStr.split('/');
         if (parts.length === 3) {
             return `${parts[2]}-${parts[1]}-${parts[0]}`;
@@ -77,12 +79,14 @@ export default function FormUpdateSeller({
         if (!dateStr) return "";
         const parts = dateStr.split('-');
         if (parts.length === 3) {
+            // YYYY-MM-DD -> dd/MM/yyyy
             return `${parts[2]}/${parts[1]}/${parts[0]}`;
         }
         return dateStr;
     }
 
     const onFormSubmit = (data: Seller) => {
+        // Merge with initial ID just in case
         const updatedSeller: Seller = {
             ...data,
             id: initialData.id,

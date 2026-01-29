@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Trash2 } from "lucide-react";
+import ModalDeleteSales from "./ModalDeleteSales";
 
 enum SaleStatus {
     Pendente = 0,
@@ -30,9 +32,13 @@ interface SalesRecord {
 
 interface SalesCardProps {
     sales: SalesRecord[];
+    onEdit?: (sale: SalesRecord) => void;
+    onDelete?: (id: number) => void;
 }
 
-export default function SalesCard({ sales }: SalesCardProps) {
+export default function SalesCard({ sales, onEdit, onDelete }: SalesCardProps) {
+    const [deleteModal, setDeleteModal] = useState(false);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -76,17 +82,31 @@ export default function SalesCard({ sales }: SalesCardProps) {
             {sales.map((sale) => (
                 <div key={sale.id} className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100 transition-all hover:shadow-md">
                     <div className="flex justify-between items-start mb-3">
-                        <div>
+                        <div onClick={() => onEdit?.(sale)} className="cursor-pointer">
                             <p className="font-bold text-gray-900 text-lg">{sale.sellerName}</p>
                             <p className="text-xs text-gray-400">ID: {sale.id}</p>
                         </div>
-                        <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                                sale.status
-                            )}`}
-                        >
-                            {getStatusLabel(sale.status)}
-                        </span>
+                        <div className="flex items-center gap-2">
+                            <span
+                                className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
+                                    sale.status
+                                )}`}
+                            >
+                                {getStatusLabel(sale.status)}
+                            </span>
+                            {onDelete && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setDeleteModal(true);
+                                        setSelectedId(sale.id);
+                                    }}
+                                    className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                                >
+                                    <Trash2 className="h-5 w-5" />
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     <div className="space-y-2">
@@ -101,6 +121,21 @@ export default function SalesCard({ sales }: SalesCardProps) {
                     </div>
                 </div>
             ))}
+
+            {deleteModal && selectedId !== null && (
+                <ModalDeleteSales
+                    id={selectedId}
+                    onDelete={async () => {
+                        onDelete?.(selectedId);
+                        setDeleteModal(false);
+                        setSelectedId(null);
+                    }}
+                    onClose={() => {
+                        setDeleteModal(false);
+                        setSelectedId(null);
+                    }}
+                />
+            )}
         </div>
     );
 }

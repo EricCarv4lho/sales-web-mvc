@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, DollarSign } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import ModalDeleteSales from "./ModalDeleteSales";
 
 enum SaleStatus {
     Pendente = 0,
@@ -36,10 +37,13 @@ interface GroupedSales {
 
 interface GroupedSalesCardProps {
     groupedSales: GroupedSales[];
+    onDelete?: (id: number) => void;
 }
 
-export default function GroupedSalesCard({ groupedSales }: GroupedSalesCardProps) {
+export default function GroupedSalesCard({ groupedSales, onDelete }: GroupedSalesCardProps) {
     const [expandedDepts, setExpandedDepts] = useState<Set<string>>(new Set());
+    const [deleteModal, setDeleteModal] = useState(false);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
 
     const toggleDepartment = (deptName: string) => {
         const newExpanded = new Set(expandedDepts);
@@ -149,13 +153,27 @@ export default function GroupedSalesCard({ groupedSales }: GroupedSalesCardProps
                                                 <p className="font-semibold text-gray-900">{sale.sellerName}</p>
                                                 <p className="text-xs text-gray-400">ID: {sale.id}</p>
                                             </div>
-                                            <span
-                                                className={`px-2 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                                                    sale.status
-                                                )}`}
-                                            >
-                                                {getStatusLabel(sale.status)}
-                                            </span>
+                                            <div className="flex items-center gap-2">
+                                                <span
+                                                    className={`px-2 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
+                                                        sale.status
+                                                    )}`}
+                                                >
+                                                    {getStatusLabel(sale.status)}
+                                                </span>
+                                                {onDelete && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setDeleteModal(true);
+                                                            setSelectedId(sale.id);
+                                                        }}
+                                                        className="text-red-500 hover:text-red-700 transition-colors p-1"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                         <div className="space-y-1">
                                             <div className="flex justify-between items-center">
@@ -178,6 +196,21 @@ export default function GroupedSalesCard({ groupedSales }: GroupedSalesCardProps
                     </div>
                 );
             })}
+
+            {deleteModal && selectedId !== null && (
+                <ModalDeleteSales
+                    id={selectedId}
+                    onDelete={async () => {
+                        onDelete?.(selectedId);
+                        setDeleteModal(false);
+                        setSelectedId(null);
+                    }}
+                    onClose={() => {
+                        setDeleteModal(false);
+                        setSelectedId(null);
+                    }}
+                />
+            )}
         </div>
     );
 }
