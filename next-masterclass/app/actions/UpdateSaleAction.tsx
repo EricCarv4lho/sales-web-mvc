@@ -3,14 +3,14 @@
 import { cookies } from "next/headers";
 
 interface SaleUpdateProps {
-    id: number;
+
     date: string;
     amount: number;
     status: number;
     sellerId: number;
 }
 
-export default async function UpdateSaleAction(sale: SaleUpdateProps) {
+export default async function UpdateSaleAction(sale: SaleUpdateProps, id: number) {
     try {
         const cookieStore = await cookies();
         const token = cookieStore.get("token")?.value;
@@ -20,7 +20,7 @@ export default async function UpdateSaleAction(sale: SaleUpdateProps) {
         }
 
         const response = await fetch(
-            `http://localhost:5225/api/SalesRecords/${sale.id}`,
+            `http://localhost:5225/api/SalesRecords/${id}`,
             {
                 method: "PUT",
                 headers: {
